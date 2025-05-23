@@ -1,0 +1,1849 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vendor Registration | Partner with Rashmi Metaliks | Supplier Portal</title>
+    <meta name="description" content="Register as a vendor with Rashmi Metaliks, the world's 2nd largest DI pipe manufacturer. Submit your company profile to join our supplier network and explore business opportunities.">
+    <meta name="keywords" content="vendor registration, supplier portal, Rashmi Metaliks partnership, steel supply chain, procurement, vendor application, supplier opportunities, DI pipes vendor, raw material supplier, Indian steel manufacturer vendor, global supply chain">
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="Vendor Registration | Partner with Rashmi Metaliks">
+    <meta property="og:description" content="Register as a vendor with Rashmi Metaliks, the world's 2nd largest DI pipe manufacturer. Submit your company profile to join our supplier network.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://www.rashmimetaliks.com/vendor-registration">
+    <meta property="og:image" content="https://www.rashmimetaliks.com/lovable-uploads/vendor-registration-og.jpg">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="https://www.rashmimetaliks.com/favicon.ico">
+    
+    <!-- External Libraries -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script src="https://unpkg.com/framer-motion@10/dist/framer-motion.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    
+    <!-- Custom Tailwind Configuration -->
+    <script>
+        // EmailJS Configuration
+        (function() {
+            emailjs.init({
+                publicKey: "vQKQ2FDhDOH2WrsGc"
+            });
+        })();
+
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        'rashmi-red': '#D23C57',
+                        'rashmi-dark': '#1A1A23',
+                        background: 'hsl(var(--background))',
+                        foreground: 'hsl(var(--foreground))',
+                        card: 'hsl(var(--card))',
+                        'card-foreground': 'hsl(var(--card-foreground))',
+                        popover: 'hsl(var(--popover))',
+                        'popover-foreground': 'hsl(var(--popover-foreground))',
+                        primary: 'hsl(var(--primary))',
+                        'primary-foreground': 'hsl(var(--primary-foreground))',
+                        secondary: 'hsl(var(--secondary))',
+                        'secondary-foreground': 'hsl(var(--secondary-foreground))',
+                        muted: 'hsl(var(--muted))',
+                        'muted-foreground': 'hsl(var(--muted-foreground))',
+                        accent: 'hsl(var(--accent))',
+                        'accent-foreground': 'hsl(var(--accent-foreground))',
+                        destructive: 'hsl(var(--destructive))',
+                        'destructive-foreground': 'hsl(var(--destructive-foreground))',
+                        border: 'hsl(var(--border))',
+                        input: 'hsl(var(--input))',
+                        ring: 'hsl(var(--ring))',
+                    },
+                    fontFamily: {
+                        'display': ['Lexend', 'system-ui', 'sans-serif'],
+                        'sans': ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                    animation: {
+                        'spin-slow': 'spin 12s linear infinite',
+                        'float': 'float 3s ease-in-out infinite',
+                        'fade-in': 'fadeIn 0.6s ease-out forwards',
+                        'pulse-slow': 'pulseSlow 4s ease-in-out infinite',
+                        'wave1': 'wave1 8s ease-in-out infinite',
+                        'wave2': 'wave2 12s ease-in-out infinite',
+                        'shimmer': 'shimmer 1.5s linear infinite',
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        /* Light mode (default) */
+        :root {
+            --background: 0 0% 98%;
+            --foreground: 225 10% 10%;
+            --card: 0 0% 100%;
+            --card-foreground: 225 10% 10%;
+            --popover: 0 0% 100%;
+            --popover-foreground: 225 10% 10%;
+            --primary: 354 78% 51%;
+            --primary-foreground: 0 0% 98%;
+            --secondary: 225 10% 90%;
+            --secondary-foreground: 225 10% 10%;
+            --muted: 225 10% 92%;
+            --muted-foreground: 225 5% 40%;
+            --accent: 225 10% 92%;
+            --accent-foreground: 225 10% 10%;
+            --destructive: 0 84% 60%;
+            --destructive-foreground: 0 0% 98%;
+            --border: 225 10% 85%;
+            --input: 225 10% 85%;
+            --ring: 354 78% 51%;
+            --rashmi-red: 354 78% 51%;
+            --rashmi-dark: 225 10% 10%;
+            --radius: 0.5rem;
+        }
+
+        /* Dark mode */
+        .dark {
+            --background: 225 15% 8%;
+            --foreground: 0 0% 93%;
+            --card: 225 15% 10%;
+            --card-foreground: 0 0% 93%;
+            --popover: 225 15% 10%;
+            --popover-foreground: 0 0% 93%;
+            --primary: 354 78% 51%;
+            --primary-foreground: 0 0% 98%;
+            --secondary: 225 10% 15%;
+            --secondary-foreground: 0 0% 93%;
+            --muted: 225 10% 15%;
+            --muted-foreground: 225 5% 65%;
+            --accent: 225 10% 15%;
+            --accent-foreground: 0 0% 93%;
+            --destructive: 0 84% 60%;
+            --destructive-foreground: 0 0% 98%;
+            --border: 225 10% 20%;
+            --input: 225 10% 20%;
+            --ring: 354 78% 51%;
+            --rashmi-red: 354 78% 51%;
+            --rashmi-dark: 0 0% 93%;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background-color: hsl(var(--background));
+            color: hsl(var(--foreground));
+            scroll-behavior: smooth;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        h1, h2, h3, .font-display {
+            font-family: 'Lexend', system-ui, sans-serif;
+        }
+
+        /* Custom Animations */
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        @keyframes pulseSlow {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.05); opacity: 0.7; }
+        }
+
+        @keyframes wave1 {
+            0% { transform: translateY(100%); }
+            50% { transform: translateY(15%); }
+            100% { transform: translateY(100%); }
+        }
+
+        @keyframes wave2 {
+            0% { transform: translateY(100%) scale(1.2); }
+            50% { transform: translateY(40%) scale(1.2); }
+            100% { transform: translateY(100%) scale(1.2); }
+        }
+
+        @keyframes confetti-fall {
+            0% { transform: translateY(-150px) rotate(0deg) scale(1); opacity: 1; }
+            100% { transform: translateY(calc(100% + 150px)) rotate(720deg) scale(0.5); opacity: 0; }
+        }
+
+        /* Confetti Animation */
+        .success-confetti {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; overflow: hidden; z-index: 20;
+        }
+
+        .confetti-item {
+            position: absolute;
+            width: 8px; height: 12px;
+            border-radius: 2px;
+            opacity: 0;
+            animation: confetti-fall 3.5s ease-in-out forwards;
+            transform-origin: center;
+        }
+
+        .confetti-item-0 { left: 10%; background-color: #EF4444; animation-delay: 0.1s; animation-duration: 3s; }
+        .confetti-item-1 { left: 25%; background-color: #3B82F6; animation-delay: 0.4s; animation-duration: 3.8s; }
+        .confetti-item-2 { left: 45%; background-color: #10B981; animation-delay: 0.2s; animation-duration: 3.2s; }
+        .confetti-item-3 { left: 65%; background-color: #F59E0B; animation-delay: 0.6s; animation-duration: 4s; }
+        .confetti-item-4 { left: 85%; background-color: #8B5CF6; animation-delay: 0.3s; animation-duration: 3.5s; }
+
+        /* Parallax optimizations */
+        .parallax-bg {
+            will-change: transform;
+            transform: translateZ(0);
+            backface-visibility: hidden;
+        }
+
+        /* Form Styles */
+        .form-input {
+            background-color: hsl(var(--background) / 0.7);
+            border: 1px solid hsl(var(--border));
+            border-radius: 0.375rem;
+            padding: 0.5rem 0.75rem;
+            transition: all 0.2s;
+            color: hsl(var(--foreground));
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: hsl(var(--rashmi-red) / 0.8);
+            box-shadow: 0 0 0 3px hsl(var(--rashmi-red) / 0.1);
+        }
+
+        .form-error {
+            color: hsl(var(--destructive));
+            font-size: 0.75rem;
+            margin-top: 0.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(to right, hsl(var(--rashmi-red)), hsl(0 84% 60%));
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 0.75rem;
+            border: none;
+            font-size: 1.125rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.8;
+            cursor: not-allowed;
+        }
+
+        .shimmer-effect {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to right, transparent, rgba(255,255,255,0.2), transparent);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s linear infinite;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background-color: hsl(var(--border) / 0.5);
+            border-radius: 10px;
+            border: 2px solid transparent;
+            background-clip: content-box;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background-color: hsl(var(--border));
+        }
+
+        /* Progress bar styles */
+        .progress-bar {
+            background: linear-gradient(to right, hsl(var(--rashmi-red)), hsl(0 84% 60%));
+            height: 100%;
+            border-radius: inherit;
+            transition: width 0.3s ease;
+        }
+
+        /* File upload styles */
+        .file-drop-zone {
+            border: 2px dashed hsl(var(--border) / 0.6);
+            border-radius: 0.75rem;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            min-height: 12rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: hsl(var(--muted) / 0.2);
+        }
+
+        .file-drop-zone.drag-over {
+            border-color: hsl(var(--rashmi-red));
+            background: hsl(var(--rashmi-red) / 0.1);
+            transform: scale(1.02);
+        }
+
+        .file-preview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            width: 100%;
+            padding: 1rem;
+        }
+
+        .file-item {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 0.75rem;
+            background: hsl(var(--card) / 0.9);
+            border-radius: 0.5rem;
+            border: 1px solid hsl(var(--border) / 0.3);
+        }
+
+        .file-remove-btn {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: hsl(var(--card) / 0.9);
+            border: 1px solid hsl(var(--border) / 0.5);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            transition: all 0.2s;
+        }
+
+        .file-remove-btn:hover {
+            background: hsl(var(--destructive) / 0.1);
+            color: hsl(var(--destructive));
+        }
+
+        /* Theme Toggle Button */
+        .theme-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 0.5rem;
+            border: 1px solid hsl(var(--border));
+            background: hsl(var(--background));
+            color: hsl(var(--foreground));
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .theme-toggle:hover {
+            background: hsl(var(--muted));
+            border-color: hsl(var(--rashmi-red) / 0.5);
+        }
+
+        /* Dark mode specific styles for amber notice */
+        .dark .bg-amber-50 {
+            background-color: rgb(45 30 3 / 0.3);
+        }
+
+        .dark .border-amber-200 {
+            border-color: rgb(245 158 11 / 0.3);
+        }
+
+        .dark .text-amber-800 {
+            color: rgb(245 158 11);
+        }
+
+        .dark .text-amber-700 {
+            color: rgb(245 158 11 / 0.9);
+        }
+
+        .dark .text-amber-600 {
+            color: rgb(245 158 11);
+        }
+
+        /* Smooth transitions for theme switching */
+        * {
+            transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-background via-gray-50 to-blue-50/30 dark:via-gray-900 dark:to-blue-950/30">
+    <!-- Header -->
+    <header class="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border/30">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <img src="https://res.cloudinary.com/dada5hjp3/image/upload/v1747985668/Rashmi-logo-light_dtolbr.png" alt="Rashmi Metaliks" class="h-10 md:h-12 dark:hidden">
+                    <img src="https://res.cloudinary.com/dada5hjp3/image/upload/v1747985668/Rashmi-logo-light_dtolbr.png" alt="Rashmi Metaliks" class="h-10 md:h-12 hidden dark:block">
+                </div>
+                <div class="flex items-center space-x-6">
+                    <nav class="hidden md:flex items-center space-x-6">
+                        <a href="https://www.rashmimetaliks.com/" class="text-muted-foreground hover:text-rashmi-red transition-colors">Home</a>
+                        <a href="https://www.rashmimetaliks.com/about" class="text-muted-foreground hover:text-rashmi-red transition-colors">About</a>
+                        <a href="https://www.rashmimetaliks.com/products" class="text-muted-foreground hover:text-rashmi-red transition-colors">Products</a>
+                        <a href="https://www.rashmimetaliks.com/contact" class="text-muted-foreground hover:text-rashmi-red transition-colors">Contact</a>
+                    </nav>
+                    <!-- Theme Toggle Button -->
+                    <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">
+                        <i data-lucide="sun" class="w-5 h-5 block dark:hidden"></i>
+                        <i data-lucide="moon" class="w-5 h-5 hidden dark:block"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+        <!-- Hero Section -->
+        <section class="pt-48 pb-32 relative isolate overflow-hidden">
+            <!-- Background Elements -->
+            <div class="absolute inset-0 z-[-10] opacity-50">
+                <!-- Grid Pattern -->
+                <svg class="absolute inset-0 h-full w-full stroke-gray-300/30 dark:stroke-neutral-700/30 [mask-image:radial-gradient(100%_100%_at_top_center,white,transparent)]" aria-hidden="true">
+                    <defs>
+                        <pattern id="hero-pattern" width="80" height="80" x="50%" y="-1" patternUnits="userSpaceOnUse">
+                            <path d="M.5 200V.5H200" fill="none"/>
+                        </pattern>
+                    </defs>
+                    <rect width="100%" height="100%" stroke-width="0" fill="url(#hero-pattern)"/>
+                </svg>
+                <!-- Gradient Shapes -->
+                <div class="absolute -right-[15%] top-[5%] w-[50%] h-[50%] rounded-full bg-gradient-to-br from-rashmi-red/15 via-rashmi-red/5 to-transparent blur-3xl opacity-70 parallax-bg"></div>
+                <div class="absolute -left-[10%] bottom-[10%] w-[40%] h-[40%] rounded-full bg-gradient-to-tr from-blue-500/15 via-blue-500/5 to-transparent blur-3xl opacity-60 parallax-bg"></div>
+                <!-- Main Gradient Overlay -->
+                <div class="absolute inset-0 bg-gradient-to-b from-background/80 via-background/95 to-background z-[-5]"></div>
+            </div>
+
+            <div class="container mx-auto px-4 relative z-10">
+                <div class="flex flex-col items-center text-center max-w-4xl mx-auto">
+                    <!-- Breadcrumb -->
+                    <div class="flex items-center text-sm text-muted-foreground/80 mb-6 self-start w-full">
+                        <a href="https://www.rashmimetaliks.com/" class="hover:text-rashmi-red transition-colors duration-200 group flex items-center gap-1">
+                            <i data-lucide="home" class="w-4 h-4"></i>
+                            Home
+                        </a>
+                        <i data-lucide="chevron-right" class="mx-1.5 h-4 w-4 text-muted-foreground/40"></i>
+                        <span class="font-medium text-foreground">Vendor Profile Submission</span>
+                    </div>
+
+                    <!-- Main Title -->
+                    <div class="mb-6 overflow-hidden">
+                        <h1 class="text-5xl md:text-6xl lg:text-7xl font-display font-extrabold tracking-tighter text-foreground leading-tight animate-fade-in">
+                            Share Your Profile, <br class="hidden md:block" /> Partner with <span class="text-rashmi-red relative inline-block px-2">
+                                Rashmi
+                                <span class="absolute -bottom-2 left-0 w-full h-1.5 bg-rashmi-red/80 rounded-full"></span>
+                            </span> Metaliks.
+                        </h1>
+                    </div>
+
+                    <!-- Description -->
+                    <p class="text-lg md:text-xl text-muted-foreground max-w-3xl mb-6 leading-relaxed animate-fade-in">
+                        This is your digital window to share your company profile with us. Our procurement team will review your submission before proceeding with the formal vendor registration process.
+                    </p>
+
+                    <!-- Important Notice -->
+                    <div class="w-full max-w-3xl mx-auto mb-10 mt-2 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/60 rounded-xl px-6 py-5 shadow-sm relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-amber-300 to-amber-500"></div>
+                        <div class="flex items-start gap-3">
+                            <div class="shrink-0 mt-0.5">
+                                <i data-lucide="alert-circle" class="h-6 w-6 text-amber-600 dark:text-amber-500"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-amber-800 dark:text-amber-400 mb-1.5">Important Notice</h4>
+                                <p class="text-amber-700/90 dark:text-amber-300/90 text-sm leading-relaxed">
+                                    We do not charge any registration amount. Please avoid online transaction of money. Interested vendor/supplier can send company profile & details by courier or postal to above address or upload Company Profile online. You will be contacted by our central Procurement team (Corporate) directly.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- CTA Button -->
+                    <a href="#registration-form" class="group inline-flex items-center justify-center gap-2.5 py-3.5 px-8 bg-gradient-to-r from-rashmi-red to-red-700 text-white rounded-full font-semibold text-lg hover:shadow-xl hover:shadow-rashmi-red/30 focus:outline-none focus:ring-4 focus:ring-rashmi-red/40 transition-all duration-300 transform hover:-translate-y-1 relative overflow-hidden">
+                        <span class="shimmer-effect"></span>
+                        <span class="relative z-10">Submit Your Profile</span>
+                        <i data-lucide="arrow-right" class="w-5 h-5 transition-transform duration-300 group-hover:translate-x-1.5 relative z-10"></i>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Registration Form Section -->
+        <section id="registration-form" class="py-24 relative isolate">
+            <!-- Background Elements -->
+            <div class="absolute inset-0 z-[-1] pointer-events-none">
+                <div class="absolute -left-[20%] top-[15%] w-[40%] h-[50%] rounded-full bg-gradient-to-br from-blue-500/10 via-blue-500/5 to-transparent blur-3xl opacity-60 parallax-bg"></div>
+                <div class="absolute -right-[10%] bottom-[5%] w-[35%] h-[40%] rounded-full bg-gradient-to-tl from-rashmi-red/10 via-rashmi-red/5 to-transparent blur-3xl opacity-50 parallax-bg"></div>
+            </div>
+
+            <div class="container mx-auto px-4 relative">
+                <!-- Success State (Hidden initially) -->
+                <div id="success-state" class="hidden max-w-2xl mx-auto text-center p-10 md:p-16 bg-gradient-to-br from-green-50 via-white to-green-50 dark:from-green-950/30 dark:via-neutral-900 dark:to-green-950/30 rounded-3xl border border-green-300/50 dark:border-green-700/30 shadow-2xl shadow-green-200/30 dark:shadow-green-900/30 relative overflow-hidden">
+                    <!-- Success Checkmark -->
+                    <div class="w-20 h-20 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center mx-auto mb-8 shadow-lg shadow-green-500/30">
+                        <i data-lucide="check" class="w-10 h-10 text-white stroke-[3]"></i>
+                    </div>
+
+                    <!-- Success Message -->
+                    <h2 class="text-3xl md:text-4xl font-bold mb-4 text-emerald-800 dark:text-emerald-200 tracking-tight">
+                        Profile Submitted Successfully!
+                    </h2>
+                    <p class="text-muted-foreground dark:text-neutral-300 mb-10 leading-relaxed text-lg">
+                        Thank you for your interest! We've received your company profile and our procurement team will review your details. If your profile meets our requirements, we'll contact you to proceed with the formal vendor registration process.
+                    </p>
+
+                    <!-- Button to Reset -->
+                    <button id="submit-another-btn" class="inline-flex items-center gap-2 rounded-full px-8 py-3 border border-emerald-300 dark:border-emerald-700 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-50 dark:hover:bg-emerald-900/50 hover:border-emerald-400 dark:hover:border-emerald-600 focus:ring-emerald-500/30 transition-all duration-300">
+                        <i data-lucide="refresh-ccw" class="w-4 h-4"></i>
+                        Submit Another Profile
+                    </button>
+
+                    <!-- Confetti -->
+                    <div class="success-confetti">
+                        <div class="confetti-item confetti-item-0"></div>
+                        <div class="confetti-item confetti-item-1"></div>
+                        <div class="confetti-item confetti-item-2"></div>
+                        <div class="confetti-item confetti-item-3"></div>
+                        <div class="confetti-item confetti-item-4"></div>
+                        <div class="confetti-item confetti-item-0"></div>
+                        <div class="confetti-item confetti-item-1"></div>
+                        <div class="confetti-item confetti-item-2"></div>
+                        <div class="confetti-item confetti-item-3"></div>
+                        <div class="confetti-item confetti-item-4"></div>
+                        <div class="confetti-item confetti-item-0"></div>
+                        <div class="confetti-item confetti-item-1"></div>
+                        <div class="confetti-item confetti-item-2"></div>
+                        <div class="confetti-item confetti-item-3"></div>
+                        <div class="confetti-item confetti-item-4"></div>
+                        <div class="confetti-item confetti-item-0"></div>
+                        <div class="confetti-item confetti-item-1"></div>
+                        <div class="confetti-item confetti-item-2"></div>
+                        <div class="confetti-item confetti-item-3"></div>
+                        <div class="confetti-item confetti-item-4"></div>
+                        <div class="confetti-item confetti-item-0"></div>
+                        <div class="confetti-item confetti-item-1"></div>
+                        <div class="confetti-item confetti-item-2"></div>
+                        <div class="confetti-item confetti-item-3"></div>
+                        <div class="confetti-item confetti-item-4"></div>
+                    </div>
+                </div>
+
+                <!-- Form Container -->
+                <div id="form-container" class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-start">
+                    <!-- Video Column -->
+                    <div class="lg:order-1 lg:sticky lg:top-24 flex flex-col items-center">
+                        <div class="flex flex-col items-center bg-background/90 dark:bg-neutral-900/90 rounded-2xl p-4 border border-border/10 w-full max-w-sm mx-auto">
+                            <!-- Video container -->
+                            <div class="aspect-[9/16] w-full rounded-xl overflow-hidden shadow-xl mb-6">
+                                <video autoplay muted loop playsinline class="w-full h-full object-cover" poster="https://res.cloudinary.com/dada5hjp3/image/upload/v1744700600/vendor-registration-poster.jpg">
+                                    <source src="https://res.cloudinary.com/dada5hjp3/video/upload/v1744700600/0_Business_Agreement_1080x1920_tzq7hk.mp4" type="video/mp4">
+                                    Your browser does not support the video tag.
+                                </video>
+                            </div>
+                            <!-- Text container -->
+                            <div class="text-center w-full">
+                                <h3 class="text-2xl font-semibold text-foreground mb-2">Why Submit Your Profile?</h3>
+                                <p class="text-muted-foreground">
+                                    Sharing your profile is the first step to potential business opportunities with <a href="https://www.rashmimetaliks.com/" class="text-rashmi-red hover:underline">Rashmi Metaliks</a>, the world's 2nd largest DI pipe manufacturer. Our procurement team reviews each submission to match vendors with our needs.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Form Column -->
+                    <div class="lg:order-2">
+                        <div class="w-full overflow-hidden shadow-xl dark:shadow-blue-950/10 border border-border/40 dark:border-neutral-800/60 rounded-2xl bg-card/80 dark:bg-neutral-900/80 backdrop-blur-lg">
+                            <!-- Gradient Top Border -->
+                            <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-rashmi-red/80 via-blue-500/70 to-rashmi-red/80"></div>
+                            <div class="bg-muted/30 dark:bg-neutral-800/30 border-b border-border/30 dark:border-neutral-800/50 p-8">
+                                <h2 class="text-2xl md:text-3xl font-semibold tracking-tight text-foreground">Submit your vendor profile</h2>
+                                <p class="text-base text-muted-foreground/90 mt-1">
+                                    Share your details to initiate the review process. Fields marked <span class="text-rashmi-red font-medium">*</span> are required.
+                                </p>
+                            </div>
+                            <div class="p-8 md:p-10">
+                                <form id="vendor-form" class="space-y-12">
+                                    <!-- Contact Person Details -->
+                                    <div class="space-y-6">
+                                        <div class="mb-6">
+                                            <div class="flex items-center mb-2">
+                                                <span class="p-2 bg-rashmi-red/10 rounded-full mr-3">
+                                                    <i data-lucide="user" class="h-5 w-5 text-rashmi-red"></i>
+                                                </span>
+                                                <h3 class="text-xl font-semibold text-foreground tracking-tight">Contact Person Details</h3>
+                                            </div>
+                                            <p class="text-sm text-muted-foreground ml-12 -mt-1">Primary contact for communication.</p>
+                                            <div class="mt-3 ml-12 h-[1px] bg-gradient-to-r from-rashmi-red/30 via-border to-transparent w-2/3"></div>
+                                        </div>
+                                        
+                                        <div class="grid md:grid-cols-2 gap-x-6 gap-y-5">
+                                            <div class="space-y-2">
+                                                <label for="name" class="text-sm font-medium text-muted-foreground/90">
+                                                    Full Name <span class="text-rashmi-red">*</span>
+                                                </label>
+                                                <input type="text" id="name" name="name" placeholder="e.g., Priya Sharma" class="form-input w-full" required>
+                                                <div class="form-error hidden" id="name-error">
+                                                    <i data-lucide="alert-circle" class="w-3 h-3"></i>
+                                                    <span>Full name is required</span>
+                                                </div>
+                                            </div>
+                                            <div class="space-y-2">
+                                                <label for="designation" class="text-sm font-medium text-muted-foreground/90">
+                                                    Designation <span class="text-rashmi-red">*</span>
+                                                </label>
+                                                <input type="text" id="designation" name="designation" placeholder="e.g., Procurement Head" class="form-input w-full" required>
+                                                <div class="form-error hidden" id="designation-error">
+                                                    <i data-lucide="alert-circle" class="w-3 h-3"></i>
+                                                    <span>Designation is required</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Company Information -->
+                                    <div class="space-y-6 pt-8">
+                                        <div class="mb-6">
+                                            <div class="flex items-center mb-2">
+                                                <span class="p-2 bg-rashmi-red/10 rounded-full mr-3">
+                                                    <i data-lucide="building" class="h-5 w-5 text-rashmi-red"></i>
+                                                </span>
+                                                <h3 class="text-xl font-semibold text-foreground tracking-tight">Company Information</h3>
+                                            </div>
+                                            <p class="text-sm text-muted-foreground ml-12 -mt-1">Official details about your business.</p>
+                                            <div class="mt-3 ml-12 h-[1px] bg-gradient-to-r from-rashmi-red/30 via-border to-transparent w-2/3"></div>
+                                        </div>
+
+                                        <div class="space-y-2">
+                                            <label for="companyName" class="text-sm font-medium text-muted-foreground/90">
+                                                Company/Firm Name <span class="text-rashmi-red">*</span>
+                                            </label>
+                                            <input type="text" id="companyName" name="companyName" placeholder="Your company's registered name" class="form-input w-full" required>
+                                            <div class="form-error hidden" id="companyName-error">
+                                                <i data-lucide="alert-circle" class="w-3 h-3"></i>
+                                                <span>Company name is required</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="grid md:grid-cols-2 gap-x-6 gap-y-5">
+                                            <div class="space-y-2">
+                                                <label for="firmType" class="text-sm font-medium text-muted-foreground/90">
+                                                    Type of Firm <span class="text-rashmi-red">*</span>
+                                                </label>
+                                                <select id="firmType" name="firmType" class="form-input w-full" required>
+                                                    <option value="">Select firm type...</option>
+                                                    <option value="manufacturer">MANUFACTURER/OEM</option>
+                                                    <option value="dealer">DEALER/TRADER</option>
+                                                    <option value="oem-distributor">OEM AUTHORISED DISTRIBUTER</option>
+                                                    <option value="service">SERVICE COMPANY</option>
+                                                    <option value="consultant">CONSULTANT/AGENCY</option>
+                                                </select>
+                                                <div class="form-error hidden" id="firmType-error">
+                                                    <i data-lucide="alert-circle" class="w-3 h-3"></i>
+                                                    <span>Please select a firm type</span>
+                                                </div>
+                                            </div>
+                                            <div class="space-y-2">
+                                                <label for="website" class="text-sm font-medium text-muted-foreground/90">
+                                                    Company Website (Optional)
+                                                </label>
+                                                <div class="flex items-center rounded-md border border-input dark:border-neutral-700 focus-within:ring-2 focus-within:ring-rashmi-red/50 focus-within:border-rashmi-red/80 dark:focus-within:border-rashmi-red/80 bg-background/70 dark:bg-neutral-800/50 transition-all duration-200">
+                                                    <span class="pl-3 pr-2 text-muted-foreground/60">
+                                                        <i data-lucide="globe" class="h-4 w-4"></i>
+                                                    </span>
+                                                    <input type="url" id="website" name="website" placeholder="https://yourcompany.com (optional)" class="border-0 focus:ring-0 flex-1 pl-0 bg-transparent h-9 outline-none">
+                                                </div>
+                                                <div class="form-error hidden" id="website-error">
+                                                    <i data-lucide="alert-circle" class="w-3 h-3"></i>
+                                                    <span>Please enter a valid URL if providing a website (e.g., https://example.com)</span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Vendor Type and Country Selection -->
+                                        <div class="space-y-5">
+                                            <!-- Domestic/Global Switch -->
+                                            <div class="flex flex-row items-center justify-between space-y-0 rounded-md border p-4 bg-muted/30">
+                                                <div class="space-y-0.5">
+                                                    <label class="text-base font-medium">
+                                                        <span id="vendor-type-label">Domestic Vendor</span>
+                                                    </label>
+                                                    <p class="text-sm text-muted-foreground" id="vendor-type-description">
+                                                        For vendors based in India
+                                                    </p>
+                                                </div>
+                                                <div class="relative inline-flex h-6 w-11 items-center rounded-full bg-gray-200 transition-colors focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2" id="vendor-type-switch">
+                                                    <span class="sr-only">Use setting</span>
+                                                    <span class="inline-block h-4 w-4 transform rounded-full bg-white shadow-lg ring-0 transition-transform translate-x-1" id="switch-button"></span>
+                                                </div>
+                                                <input type="hidden" id="vendorType" name="vendorType" value="domestic">
+                                            </div>
+
+                                            <!-- Country Selection -->
+                                            <div class="space-y-2">
+                                                <label for="country" class="text-sm font-medium text-muted-foreground/90">
+                                                    Country <span class="text-rashmi-red">*</span>
+                                                </label>
+                                                <select id="country" name="country" class="form-input w-full" required disabled>
+                                                    <option value="in">India</option>
+                                                    <option value="ae">United Arab Emirates</option>
+                                                    <option value="au">Australia</option>
+                                                    <option value="bg">Bangladesh</option>
+                                                    <option value="bt">Bhutan</option>
+                                                    <option value="ca">Canada</option>
+                                                    <option value="cn">China</option>
+                                                    <option value="de">Germany</option>
+                                                    <option value="fr">France</option>
+                                                    <option value="gb">United Kingdom</option>
+                                                    <option value="id">Indonesia</option>
+                                                    <option value="it">Italy</option>
+                                                    <option value="jp">Japan</option>
+                                                    <option value="kr">South Korea</option>
+                                                    <option value="lk">Sri Lanka</option>
+                                                    <option value="my">Malaysia</option>
+                                                    <option value="np">Nepal</option>
+                                                    <option value="nz">New Zealand</option>
+                                                    <option value="qa">Qatar</option>
+                                                    <option value="ru">Russia</option>
+                                                    <option value="sa">Saudi Arabia</option>
+                                                    <option value="sg">Singapore</option>
+                                                    <option value="th">Thailand</option>
+                                                    <option value="us">United States</option>
+                                                    <option value="za">South Africa</option>
+                                                    <option value="others">Others</option>
+                                                </select>
+                                                <div class="form-error hidden" id="country-error">
+                                                    <i data-lucide="alert-circle" class="w-3 h-3"></i>
+                                                    <span>Country is required</span>
+                                                </div>
+                                                
+                                                <!-- Custom Country Fields -->
+                                                <div id="custom-country-fields" class="hidden mt-3 flex flex-col gap-2">
+                                                    <input type="text" id="customCountry" name="customCountry" placeholder="Enter your country name" class="form-input w-full">
+                                                    <input type="text" id="customCountryCode" name="customCountryCode" placeholder="Enter country code (e.g. +975)" class="form-input w-full">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Contact Details -->
+                                    <div class="space-y-6 pt-8">
+                                        <div class="mb-6">
+                                            <div class="flex items-center mb-2">
+                                                <span class="p-2 bg-rashmi-red/10 rounded-full mr-3">
+                                                    <i data-lucide="phone" class="h-5 w-5 text-rashmi-red"></i>
+                                                </span>
+                                                <h3 class="text-xl font-semibold text-foreground tracking-tight">Contact Details</h3>
+                                            </div>
+                                            <p class="text-sm text-muted-foreground ml-12 -mt-1">How we can reach you.</p>
+                                            <div class="mt-3 ml-12 h-[1px] bg-gradient-to-r from-rashmi-red/30 via-border to-transparent w-2/3"></div>
+                                        </div>
+
+                                        <div class="grid md:grid-cols-2 gap-x-6 gap-y-5">
+                                            <div class="space-y-2">
+                                                <label for="contactNo" class="text-sm font-medium text-muted-foreground/90">
+                                                    Contact Number (with country code) <span class="text-rashmi-red">*</span>
+                                                </label>
+                                                <div class="flex items-center gap-2">
+                                                    <span id="country-code-badge" class="hidden px-2 py-1 rounded bg-muted/50 text-muted-foreground font-mono text-sm border border-border"></span>
+                                                    <input type="tel" id="contactNo" name="contactNo" placeholder="XXXXXXXXXX" class="form-input flex-1" value="+91 " required>
+                                                </div>
+                                                <div class="form-error hidden" id="contactNo-error">
+                                                    <i data-lucide="alert-circle" class="w-3 h-3"></i>
+                                                    <span>Contact number is required</span>
+                                                </div>
+                                            </div>
+                                            <div class="space-y-2">
+                                                <label for="email" class="text-sm font-medium text-muted-foreground/90">
+                                                    Email Address <span class="text-rashmi-red">*</span>
+                                                </label>
+                                                <input type="email" id="email" name="email" placeholder="contact@yourcompany.com" class="form-input w-full" required>
+                                                <div class="form-error hidden" id="email-error">
+                                                    <i data-lucide="alert-circle" class="w-3 h-3"></i>
+                                                    <span>Email is required</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Product/Service Information -->
+                                    <div class="space-y-6 pt-8">
+                                        <div class="mb-6">
+                                            <div class="flex items-center mb-2">
+                                                <span class="p-2 bg-rashmi-red/10 rounded-full mr-3">
+                                                    <i data-lucide="briefcase" class="h-5 w-5 text-rashmi-red"></i>
+                                                </span>
+                                                <h3 class="text-xl font-semibold text-foreground tracking-tight">Product/Service Information</h3>
+                                            </div>
+                                            <p class="text-sm text-muted-foreground ml-12 -mt-1">Details about what you offer.</p>
+                                            <div class="mt-3 ml-12 h-[1px] bg-gradient-to-r from-rashmi-red/30 via-border to-transparent w-2/3"></div>
+                                        </div>
+
+                                        <div class="space-y-2">
+                                            <label for="category" class="text-sm font-medium text-muted-foreground/90">
+                                                Primary Category <span class="text-rashmi-red">*</span>
+                                            </label>
+                                            <div class="relative">
+                                                <div class="absolute -top-5 right-0 flex items-center text-xs text-muted-foreground">
+                                                    <i data-lucide="info" class="w-3 h-3 mr-1"></i>
+                                                    Categories numbered according to standard classification
+                                                </div>
+                                                <select id="category" name="category" class="form-input w-full" required>
+                                                    <option value="">Select primary category...</option>
+                                                    <option value="stationary-computer">1. Stationary, Computer & Computer Accessories</option>
+                                                    <option value="cloth-textiles">2. Cloth, Textiles</option>
+                                                    <option value="rubber-pvc-belts">3. Rubber, PVC, Conveyor Belts, V Belts, Tyre</option>
+                                                    <option value="safety-fire-service">4. Safety Items & Fire Service</option>
+                                                    <option value="paint-abrasive-hardware">5. Paint, Abrasive, Hardware</option>
+                                                    <option value="pipe-building-material">6. Pipe, Pipe Fitting, Building Material & Sanitary</option>
+                                                    <option value="packing-materials">7. Packing Materials</option>
+                                                    <option value="chemicals">8. Chemicals</option>
+                                                    <option value="gases">9. Gases</option>
+                                                    <option value="petroleum-lubricants">10. Petrol, Oils, Lubricant & HSD</option>
+                                                    <option value="refractory-basic-mcb">11. Refractory - Basic, MCB</option>
+                                                    <option value="refractory-castables">12. Refractory - Castables & other Bricks</option>
+                                                    <option value="raw-materials">13. Raw Materials</option>
+                                                    <option value="instrumentation-electronics">14. Instrumentation & Electronics items</option>
+                                                    <option value="bearings-cutting-tools">15. Bearings, cutting tools</option>
+                                                    <option value="fastener-nut-bolts">16. Fastener, Nut & Bolts</option>
+                                                    <option value="tools-lifting-equipment">17. Tools & Tackles & Lifting Equipment</option>
+                                                    <option value="electrical-spares">18. Electrical Spares</option>
+                                                    <option value="cable-winding-wires">19. Cable, Cabling Accessories & Winding Wires</option>
+                                                    <option value="electrical-consumables">20. Electrical Consumables</option>
+                                                    <option value="motors-spares">21. Motors & Motor Spares</option>
+                                                    <option value="electrical-welding-equipment">22. Electrical Equ & Welding Equ</option>
+                                                    <option value="fluxes-electrodes">23. Fluxes & Electrodes</option>
+                                                    <option value="rolls-roll-chocks">24. Rolls & Roll Chocks</option>
+                                                    <option value="minor-raw-materials">25. Minor Raw Materials, Ferron Alloys</option>
+                                                    <option value="amc-civil">26. AMC-Civil</option>
+                                                    <option value="amc-electrical">27. AMC-electrical</option>
+                                                    <option value="amc-mechanical">28. AMC-Mechanical</option>
+                                                    <option value="amc-others">29. AMC-others (IT, rent, HR related, Mrk related etc)</option>
+                                                    <option value="material-handling-rental">30. Material Handling equip Rental</option>
+                                                    <option value="logistics">31. Logistics (sea, CHAs)</option>
+                                                </select>
+                                            </div>
+                                            <div class="form-error hidden" id="category-error">
+                                                <i data-lucide="alert-circle" class="w-3 h-3"></i>
+                                                <span>Please select a category</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="space-y-2">
+                                            <label for="productDescription" class="text-sm font-medium text-muted-foreground/90">
+                                                Product/Service Description <span class="text-rashmi-red">*</span>
+                                            </label>
+                                            <textarea id="productDescription" name="productDescription" rows="4" placeholder="Describe your core offerings, key features, and capabilities." class="form-input w-full resize-y" required></textarea>
+                                            <div class="form-error hidden" id="productDescription-error">
+                                                <i data-lucide="alert-circle" class="w-3 h-3"></i>
+                                                <span>Description is required</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="space-y-2">
+                                            <label for="majorClients" class="text-sm font-medium text-muted-foreground/90">
+                                                Major Clients or Projects (Optional)
+                                            </label>
+                                            <textarea id="majorClients" name="majorClients" rows="3" placeholder="List key clients, projects, or industries you serve (e.g., Client A, Client B - Automotive Sector)." class="form-input w-full resize-y"></textarea>
+                                        </div>
+
+                                        <!-- Last Year Turnover Section -->
+                                        <div class="mt-6">
+                                            <div class="space-y-2">
+                                                <label for="turnover" class="text-sm font-medium text-muted-foreground/90">
+                                                    Last Year Turnover <span class="text-rashmi-red">*</span>
+                                                </label>
+                                                <div class="flex items-center gap-3">
+                                                    <div class="flex-1">
+                                                        <input type="number" id="turnover" name="turnover" step="0.01" placeholder="Enter turnover value" class="form-input w-full" required>
+                                                    </div>
+                                                    <div class="w-40">
+                                                        <select id="turnoverCurrency" name="turnoverCurrency" class="form-input w-full" required>
+                                                            <option value="INR">Rs (in Cr)</option>
+                                                            <option value="USD">USD (in Million)</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <p id="turnover-helper" class="text-xs text-muted-foreground mt-1">
+                                                    Enter value in Crores (e.g., 10.5 for ₹10.5 Crores)
+                                                </p>
+                                                <div class="form-error hidden" id="turnover-error">
+                                                    <i data-lucide="alert-circle" class="w-3 h-3"></i>
+                                                    <span>Turnover value is required</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- File Upload -->
+                                    <div class="space-y-3 pt-8">
+                                        <label for="file-upload" class="flex items-center text-lg font-semibold text-foreground tracking-tight">
+                                            <i data-lucide="upload" class="mr-2 h-5 w-5 text-rashmi-red"></i>
+                                            Supporting Documents (Optional)
+                                        </label>
+                                        <p class="text-sm text-muted-foreground/90 mb-3">
+                                            Upload up to 3 files: company profile, brochures, certifications, etc. in PDF or Word format only (Max 10MB each)
+                                        </p>
+
+                                        <!-- File Counter -->
+                                        <div class="flex items-center justify-between mb-2">
+                                            <span class="text-sm text-muted-foreground" id="file-counter">
+                                                No files selected
+                                            </span>
+                                            <button type="button" id="clear-all-files" class="hidden text-sm text-muted-foreground hover:text-destructive transition-colors">
+                                                Clear all
+                                            </button>
+                                        </div>
+
+                                        <!-- File Drop Area -->
+                                        <div id="file-drop-zone" class="file-drop-zone">
+                                            <input type="file" id="file-upload" name="supportingDocuments" multiple accept=".pdf,.doc,.docx" class="hidden">
+                                            
+                                            <!-- Default Upload UI -->
+                                            <div id="upload-placeholder" class="text-center">
+                                                <i data-lucide="upload" class="h-14 w-14 mb-4 text-muted-foreground/60 dark:text-neutral-500 mx-auto"></i>
+                                                <p class="font-semibold text-lg text-foreground dark:text-neutral-200 mb-1">
+                                                    <span class="text-rashmi-red">Click to upload</span> or drag & drop
+                                                </p>
+                                                <p class="text-xs text-muted-foreground dark:text-neutral-400">
+                                                    PDF or Word documents only (up to 3 files)
+                                                </p>
+                                            </div>
+
+                                            <!-- File Preview -->
+                                            <div id="file-preview" class="file-preview hidden"></div>
+
+                                            <!-- Upload Progress Overlay -->
+                                            <div id="upload-progress" class="hidden absolute inset-0 bg-background/70 dark:bg-neutral-900/70 backdrop-blur-sm flex items-center justify-center rounded-xl">
+                                                <div class="w-full max-w-xs text-center">
+                                                    <i data-lucide="loader-2" class="h-8 w-8 text-rashmi-red animate-spin mx-auto mb-3"></i>
+                                                    <p class="text-sm font-medium text-foreground mb-2">Uploading...</p>
+                                                    <div class="h-2 bg-gray-200 rounded-full overflow-hidden">
+                                                        <div id="progress-bar" class="progress-bar w-0"></div>
+                                                    </div>
+                                                    <p class="text-xs text-muted-foreground mt-1"><span id="progress-text">0</span>%</p>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Error Messages -->
+                                        <div id="file-errors" class="hidden mt-2">
+                                            <button type="button" id="clear-file-errors" class="text-xs text-muted-foreground mt-1 hover:text-foreground transition-colors">
+                                                Clear errors
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <!-- Terms and Submit -->
+                                    <div class="pt-10 space-y-8">
+                                        <!-- Terms Checkbox -->
+                                        <div class="flex items-start space-x-3 rounded-lg border border-border/50 dark:border-neutral-700/50 p-4 bg-muted/20 dark:bg-neutral-800/20">
+                                            <input type="checkbox" id="terms" name="terms" class="mt-0.5 h-4 w-4 text-rashmi-red focus:ring-rashmi-red border-muted-foreground/50 dark:border-neutral-600 rounded" required>
+                                            <div class="grid gap-1.5 leading-none flex-1">
+                                                <label for="terms" class="text-sm font-medium text-foreground/90 dark:text-neutral-200 cursor-pointer">
+                                                    I confirm all information is accurate and consent to having my profile reviewed for potential vendor registration with
+                                                    <a href="https://www.rashmimetaliks.com/terms-and-conditions" target="_blank" rel="noopener noreferrer" class="text-rashmi-red hover:underline font-medium px-1 transition-colors">Terms & Conditions</a>
+                                                    and
+                                                    <a href="https://www.rashmimetaliks.com/privacy-policy" target="_blank" rel="noopener noreferrer" class="text-rashmi-red hover:underline font-medium pl-1 transition-colors">Privacy Policy</a>.
+                                                    <span class="text-destructive">*</span>
+                                                </label>
+                                                <div class="form-error hidden" id="terms-error">
+                                                    <i data-lucide="alert-circle" class="w-3 h-3"></i>
+                                                    <span>You must agree to the terms and conditions</span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Submit Button -->
+                                        <button type="submit" class="btn-primary w-full" id="submit-btn">
+                                            <span class="shimmer-effect"></span>
+                                            <span class="relative z-10 flex items-center justify-center">
+                                                <span id="submit-text">Submit Profile</span>
+                                                <i data-lucide="check" class="ml-2 h-5 w-5 transition-transform duration-300" id="submit-icon"></i>
+                                            </span>
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Benefits Section -->
+        <section class="py-24 relative bg-gradient-to-b from-blue-50/20 to-background dark:from-blue-950/20 dark:to-neutral-950 overflow-hidden">
+            <!-- Background elements -->
+            <div class="absolute inset-0 z-0 pointer-events-none opacity-60">
+                <div class="absolute -right-[5%] top-[10%] w-1/3 h-1/2 bg-rashmi-red/5 dark:bg-rashmi-red/10 rounded-full blur-3xl opacity-50 parallax-bg"></div>
+                <div class="absolute -left-[10%] bottom-[5%] w-1/2 h-1/2 bg-blue-500/5 dark:bg-blue-900/10 rounded-full blur-3xl opacity-40 parallax-bg"></div>
+                <!-- Grid Pattern -->
+                <svg class="absolute inset-0 h-full w-full stroke-gray-300/20 dark:stroke-neutral-700/20 [mask-image:radial-gradient(100%_100%_at_center_center,white,transparent)]" aria-hidden="true">
+                    <defs>
+                        <pattern id="benefits-pattern" width="60" height="60" x="50%" y="-1" patternUnits="userSpaceOnUse">
+                            <path d="M.5 60 V.5 H60" fill="none"/>
+                        </pattern>
+                    </defs>
+                    <rect width="100%" height="100%" stroke-width="0" fill="url(#benefits-pattern)"/>
+                </svg>
+            </div>
+
+            <div class="container mx-auto px-4 relative z-10">
+                <!-- Section Header -->
+                <div class="text-center max-w-3xl mx-auto mb-16">
+                    <div class="mb-3">
+                        <span class="inline-block bg-rashmi-red/10 text-rashmi-red px-3 py-1 rounded-full text-sm font-medium tracking-wide">
+                            Review Process
+                        </span>
+                    </div>
+                    <h2 class="text-4xl md:text-5xl font-display font-bold tracking-tight mb-5 text-foreground">
+                        Why Submit Your Profile?
+                    </h2>
+                    <p class="text-lg text-muted-foreground/90 dark:text-neutral-300 leading-relaxed">
+                        Your profile submission is the first step towards becoming a registered vendor with <a href="https://www.rashmimetaliks.com/" class="text-rashmi-red hover:underline">Rashmi Metaliks</a>, the world's 2nd largest DI pipe manufacturer. Our procurement team carefully reviews each submission to ensure alignment with our quality standards and business needs.
+                    </p>
+                </div>
+
+                <!-- Benefits Grid -->
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+                    <div class="bg-card/90 dark:bg-neutral-800/90 backdrop-blur-sm border border-border/30 dark:border-neutral-700/50 rounded-2xl overflow-hidden flex flex-col shadow-lg hover:shadow-xl transition-all duration-300 group hover:-translate-y-2">
+                        <div class="absolute top-0 right-0 w-48 h-48 bg-gradient-to-bl from-blue-500/10 to-blue-600/5 dark:from-blue-800/20 dark:to-blue-900/10 rounded-full blur-3xl -z-10 opacity-70 group-hover:opacity-90 transition-opacity duration-300"></div>
+                        <div class="p-6 pb-8 flex-grow relative z-10 flex flex-col">
+                            <div class="mb-5 inline-flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br from-background to-muted/60 dark:from-neutral-700 dark:to-neutral-800/50 shadow-md border border-border/20 dark:border-neutral-600/50">
+                                <i data-lucide="trending-up" class="h-7 w-7 text-rashmi-red"></i>
+                            </div>
+                            <h3 class="text-xl font-semibold mb-2.5 text-foreground dark:text-neutral-100">Expand Your Reach</h3>
+                            <p class="text-muted-foreground dark:text-neutral-300 text-sm leading-relaxed flex-grow">Access new markets and large-scale projects through our extensive network and ongoing tenders for ductile iron pipes and infrastructure projects.</p>
+                            <div class="mt-6 h-[1px] w-full bg-gradient-to-r from-rashmi-red/40 via-border/50 to-transparent"></div>
+                        </div>
+                    </div>
+
+                    <div class="bg-card/90 dark:bg-neutral-800/90 backdrop-blur-sm border border-border/30 dark:border-neutral-700/50 rounded-2xl overflow-hidden flex flex-col shadow-lg hover:shadow-xl transition-all duration-300 group hover:-translate-y-2">
+                        <div class="absolute top-0 right-0 w-48 h-48 bg-gradient-to-bl from-rashmi-red/10 to-red-600/5 dark:from-rashmi-red/20 dark:to-red-900/10 rounded-full blur-3xl -z-10 opacity-70 group-hover:opacity-90 transition-opacity duration-300"></div>
+                        <div class="p-6 pb-8 flex-grow relative z-10 flex flex-col">
+                            <div class="mb-5 inline-flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br from-background to-muted/60 dark:from-neutral-700 dark:to-neutral-800/50 shadow-md border border-border/20 dark:border-neutral-600/50">
+                                <i data-lucide="handshake" class="h-7 w-7 text-rashmi-red"></i>
+                            </div>
+                            <h3 class="text-xl font-semibold mb-2.5 text-foreground dark:text-neutral-100">Streamlined Procurement</h3>
+                            <p class="text-muted-foreground dark:text-neutral-300 text-sm leading-relaxed flex-grow">Experience efficient digital processes, clear communication, and a dedicated vendor portal with our world-class procurement team.</p>
+                            <div class="mt-6 h-[1px] w-full bg-gradient-to-r from-rashmi-red/40 via-border/50 to-transparent"></div>
+                        </div>
+                    </div>
+
+                    <div class="bg-card/90 dark:bg-neutral-800/90 backdrop-blur-sm border border-border/30 dark:border-neutral-700/50 rounded-2xl overflow-hidden flex flex-col shadow-lg hover:shadow-xl transition-all duration-300 group hover:-translate-y-2">
+                        <div class="absolute top-0 right-0 w-48 h-48 bg-gradient-to-bl from-emerald-500/10 to-green-600/5 dark:from-emerald-800/20 dark:to-green-900/10 rounded-full blur-3xl -z-10 opacity-70 group-hover:opacity-90 transition-opacity duration-300"></div>
+                        <div class="p-6 pb-8 flex-grow relative z-10 flex flex-col">
+                            <div class="mb-5 inline-flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br from-background to-muted/60 dark:from-neutral-700 dark:to-neutral-800/50 shadow-md border border-border/20 dark:border-neutral-600/50">
+                                <i data-lucide="shield-check" class="h-7 w-7 text-rashmi-red"></i>
+                            </div>
+                            <h3 class="text-xl font-semibold mb-2.5 text-foreground dark:text-neutral-100">Reliable & Timely Payments</h3>
+                            <p class="text-muted-foreground dark:text-neutral-300 text-sm leading-relaxed flex-grow">Benefit from structured payment cycles and financial predictability with Rashmi Metaliks, fostering a stable partnership for long-term growth.</p>
+                            <div class="mt-6 h-[1px] w-full bg-gradient-to-r from-rashmi-red/40 via-border/50 to-transparent"></div>
+                        </div>
+                    </div>
+
+                    <div class="bg-card/90 dark:bg-neutral-800/90 backdrop-blur-sm border border-border/30 dark:border-neutral-700/50 rounded-2xl overflow-hidden flex flex-col shadow-lg hover:shadow-xl transition-all duration-300 group hover:-translate-y-2">
+                        <div class="absolute top-0 right-0 w-48 h-48 bg-gradient-to-bl from-amber-500/10 to-yellow-600/5 dark:from-amber-800/20 dark:to-yellow-900/10 rounded-full blur-3xl -z-10 opacity-70 group-hover:opacity-90 transition-opacity duration-300"></div>
+                        <div class="p-6 pb-8 flex-grow relative z-10 flex flex-col">
+                            <div class="mb-5 inline-flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br from-background to-muted/60 dark:from-neutral-700 dark:to-neutral-800/50 shadow-md border border-border/20 dark:border-neutral-600/50">
+                                <i data-lucide="award" class="h-7 w-7 text-rashmi-red"></i>
+                            </div>
+                            <h3 class="text-xl font-semibold mb-2.5 text-foreground dark:text-neutral-100">Long-Term Growth</h3>
+                            <p class="text-muted-foreground dark:text-neutral-300 text-sm leading-relaxed flex-grow">Become a preferred partner and scale your business alongside our expanding operations and projects in the steel and iron industry.</p>
+                            <div class="mt-6 h-[1px] w-full bg-gradient-to-r from-rashmi-red/40 via-border/50 to-transparent"></div>
+                        </div>
+                    </div>
+
+                    <div class="bg-card/90 dark:bg-neutral-800/90 backdrop-blur-sm border border-border/30 dark:border-neutral-700/50 rounded-2xl overflow-hidden flex flex-col shadow-lg hover:shadow-xl transition-all duration-300 group hover:-translate-y-2">
+                        <div class="absolute top-0 right-0 w-48 h-48 bg-gradient-to-bl from-indigo-500/10 to-purple-600/5 dark:from-indigo-800/20 dark:to-purple-900/10 rounded-full blur-3xl -z-10 opacity-70 group-hover:opacity-90 transition-opacity duration-300"></div>
+                        <div class="p-6 pb-8 flex-grow relative z-10 flex flex-col">
+                            <div class="mb-5 inline-flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br from-background to-muted/60 dark:from-neutral-700 dark:to-neutral-800/50 shadow-md border border-border/20 dark:border-neutral-600/50">
+                                <i data-lucide="lightbulb" class="h-7 w-7 text-rashmi-red"></i>
+                            </div>
+                            <h3 class="text-xl font-semibold mb-2.5 text-foreground dark:text-neutral-100">Innovation Synergy</h3>
+                            <p class="text-muted-foreground dark:text-neutral-300 text-sm leading-relaxed flex-grow">Collaborate on new steel and iron solutions, gain early access to requirements, and contribute to DI pipe and infrastructure advancements.</p>
+                            <div class="mt-6 h-[1px] w-full bg-gradient-to-r from-rashmi-red/40 via-border/50 to-transparent"></div>
+                        </div>
+                    </div>
+
+                    <div class="bg-card/90 dark:bg-neutral-800/90 backdrop-blur-sm border border-border/30 dark:border-neutral-700/50 rounded-2xl overflow-hidden flex flex-col shadow-lg hover:shadow-xl transition-all duration-300 group hover:-translate-y-2">
+                        <div class="absolute top-0 right-0 w-48 h-48 bg-gradient-to-bl from-teal-500/10 to-cyan-600/5 dark:from-teal-800/20 dark:to-cyan-900/10 rounded-full blur-3xl -z-10 opacity-70 group-hover:opacity-90 transition-opacity duration-300"></div>
+                        <div class="p-6 pb-8 flex-grow relative z-10 flex flex-col">
+                            <div class="mb-5 inline-flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br from-background to-muted/60 dark:from-neutral-700 dark:to-neutral-800/50 shadow-md border border-border/20 dark:border-neutral-600/50">
+                                <i data-lucide="check-circle" class="h-7 w-7 text-rashmi-red"></i>
+                            </div>
+                            <h3 class="text-xl font-semibold mb-2.5 text-foreground dark:text-neutral-100">Sustainable Partnership</h3>
+                            <p class="text-muted-foreground dark:text-neutral-300 text-sm leading-relaxed flex-grow">Align with our commitment to responsible sourcing, ethical practices, and environmental stewardship in the metals manufacturing industry.</p>
+                            <div class="mt-6 h-[1px] w-full bg-gradient-to-r from-rashmi-red/40 via-border/50 to-transparent"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Call-to-action to Scroll back to Form -->
+                <div class="text-center mt-16">
+                    <a href="#registration-form" class="inline-flex items-center justify-center gap-2 py-3 px-7 bg-background/80 dark:bg-neutral-800/80 text-foreground border border-border/50 dark:border-neutral-700 rounded-full hover:border-rashmi-red/60 hover:text-rashmi-red dark:hover:border-rashmi-red/70 dark:hover:text-rashmi-red backdrop-blur-sm shadow-sm hover:shadow-md transition-all duration-300">
+                        Ready to Partner? Register Now
+                        <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                    </a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-card border-t border-border/30 py-12">
+        <div class="container mx-auto px-4">
+            <div class="text-center">
+                <div class="flex items-center justify-center mb-4">
+                    <img src="https://res.cloudinary.com/dada5hjp3/image/upload/v1747985668/Rashmi-logo-light_dtolbr.png" alt="Rashmi Metaliks" class="h-8 dark:hidden">
+                    <img src="https://res.cloudinary.com/dada5hjp3/image/upload/v1747985668/Rashmi-logo-light_dtolbr.png" alt="Rashmi Metaliks" class="h-8 hidden dark:block">
+                </div>
+                <p class="text-muted-foreground text-sm">
+                    World's 2nd largest DI pipe manufacturer with 770,000 MT annual capacity
+                </p>
+                <div class="flex justify-center space-x-6 mt-6">
+                    <a href="https://www.rashmimetaliks.com/" class="text-muted-foreground hover:text-rashmi-red transition-colors">Home</a>
+                    <a href="https://www.rashmimetaliks.com/about" class="text-muted-foreground hover:text-rashmi-red transition-colors">About</a>
+                    <a href="https://www.rashmimetaliks.com/products" class="text-muted-foreground hover:text-rashmi-red transition-colors">Products</a>
+                    <a href="https://www.rashmimetaliks.com/contact" class="text-muted-foreground hover:text-rashmi-red transition-colors">Contact</a>
+                    <a href="https://www.rashmimetaliks.com/privacy-policy" class="text-muted-foreground hover:text-rashmi-red transition-colors">Privacy Policy</a>
+                    <a href="https://www.rashmimetaliks.com/terms-and-conditions" class="text-muted-foreground hover:text-rashmi-red transition-colors">Terms & Conditions</a>
+                </div>
+                <p class="text-muted-foreground text-xs mt-6">
+                    © 2024 Rashmi Metaliks Limited. All rights reserved.
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        // Initialize EmailJS with your public key
+        emailjs.init({
+          publicKey: "vQKQ2FDhDOH2WrsGc"
+        });
+
+        // Global variables
+        let selectedFiles = [];
+        let isSubmitting = false;
+
+        // Theme Toggle Functionality
+        const themeToggle = document.getElementById('theme-toggle');
+        const html = document.documentElement;
+
+        // Check for saved theme preference or default to light mode
+        const savedTheme = localStorage.getItem('theme');
+        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+        // Set initial theme (prioritize saved preference, then system preference, default to light)
+        if (savedTheme) {
+            html.classList.toggle('dark', savedTheme === 'dark');
+        } else if (systemPrefersDark) {
+            html.classList.add('dark');
+            localStorage.setItem('theme', 'dark');
+        } else {
+            // Default to light mode
+            html.classList.remove('dark');
+            localStorage.setItem('theme', 'light');
+        }
+
+        // Theme toggle click handler
+        themeToggle.addEventListener('click', () => {
+            const isDark = html.classList.contains('dark');
+            html.classList.toggle('dark', !isDark);
+            localStorage.setItem('theme', !isDark ? 'dark' : 'light');
+            
+            // Update icons
+            lucide.createIcons();
+        });
+
+        // Listen for system theme changes
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+            if (!localStorage.getItem('theme')) {
+                html.classList.toggle('dark', e.matches);
+                lucide.createIcons();
+            }
+        });
+
+        // Country codes mapping
+        const countryCodes = {
+            'in': '+91',
+            'ae': '+971',
+            'au': '+61',
+            'bg': '+880',
+            'bt': '+975',
+            'ca': '+1',
+            'cn': '+86',
+            'de': '+49',
+            'fr': '+33',
+            'gb': '+44',
+            'id': '+62',
+            'it': '+39',
+            'jp': '+81',
+            'kr': '+82',
+            'lk': '+94',
+            'my': '+60',
+            'np': '+977',
+            'nz': '+64',
+            'qa': '+974',
+            'ru': '+7',
+            'sa': '+966',
+            'sg': '+65',
+            'th': '+66',
+            'us': '+1',
+            'za': '+27'
+        };
+
+        // DOM Elements
+        const vendorForm = document.getElementById('vendor-form');
+        const vendorTypeSwitch = document.getElementById('vendor-type-switch');
+        const switchButton = document.getElementById('switch-button');
+        const vendorTypeInput = document.getElementById('vendorType');
+        const vendorTypeLabel = document.getElementById('vendor-type-label');
+        const vendorTypeDescription = document.getElementById('vendor-type-description');
+        const countrySelect = document.getElementById('country');
+        const contactNoInput = document.getElementById('contactNo');
+        const countryCodeBadge = document.getElementById('country-code-badge');
+        const customCountryFields = document.getElementById('custom-country-fields');
+        const turnoverCurrencySelect = document.getElementById('turnoverCurrency');
+        const turnoverHelperText = document.getElementById('turnover-helper');
+        const fileUpload = document.getElementById('file-upload');
+        const fileDropZone = document.getElementById('file-drop-zone');
+        const fileCounter = document.getElementById('file-counter');
+        const clearAllFilesBtn = document.getElementById('clear-all-files');
+        const filePreview = document.getElementById('file-preview');
+        const uploadPlaceholder = document.getElementById('upload-placeholder');
+        const uploadProgress = document.getElementById('upload-progress');
+        const progressBar = document.getElementById('progress-bar');
+        const progressText = document.getElementById('progress-text');
+        const fileErrors = document.getElementById('file-errors');
+        const clearFileErrorsBtn = document.getElementById('clear-file-errors');
+        const submitBtn = document.getElementById('submit-btn');
+        const submitText = document.getElementById('submit-text');
+        const submitIcon = document.getElementById('submit-icon');
+        const successState = document.getElementById('success-state');
+        const formContainer = document.getElementById('form-container');
+        const submitAnotherBtn = document.getElementById('submit-another-btn');
+
+        // Vendor Type Switch
+        vendorTypeSwitch.addEventListener('click', function() {
+            const isGlobal = vendorTypeInput.value === 'domestic';
+            
+            if (isGlobal) {
+                // Switch to Global
+                vendorTypeInput.value = 'global';
+                vendorTypeLabel.textContent = 'Global Vendor';
+                vendorTypeDescription.textContent = 'For international vendors outside India';
+                switchButton.classList.add('translate-x-6');
+                vendorTypeSwitch.classList.add('bg-blue-600');
+                vendorTypeSwitch.classList.remove('bg-gray-200');
+                countrySelect.disabled = false;
+                countrySelect.classList.remove('opacity-80');
+                countrySelect.value = 'us'; // Default to US for global
+                contactNoInput.value = '';
+                updateCountryCode();
+            } else {
+                // Switch to Domestic
+                vendorTypeInput.value = 'domestic';
+                vendorTypeLabel.textContent = 'Domestic Vendor';
+                vendorTypeDescription.textContent = 'For vendors based in India';
+                switchButton.classList.remove('translate-x-6');
+                vendorTypeSwitch.classList.remove('bg-blue-600');
+                vendorTypeSwitch.classList.add('bg-gray-200');
+                countrySelect.disabled = true;
+                countrySelect.classList.add('opacity-80');
+                countrySelect.value = 'in';
+                contactNoInput.value = '+91 ';
+                updateCountryCode();
+            }
+        });
+
+        // Country Selection Change
+        countrySelect.addEventListener('change', function() {
+            const selectedValue = this.value;
+            
+            if (selectedValue === 'others') {
+                customCountryFields.classList.remove('hidden');
+                countryCodeBadge.classList.add('hidden');
+                contactNoInput.placeholder = '+__ 123456789';
+            } else {
+                customCountryFields.classList.add('hidden');
+                updateCountryCode();
+            }
+        });
+
+        // Update Country Code Badge
+        function updateCountryCode() {
+            const vendorType = vendorTypeInput.value;
+            const selectedCountry = countrySelect.value;
+            
+            if (vendorType === 'domestic') {
+                countryCodeBadge.classList.add('hidden');
+                contactNoInput.placeholder = 'XXXXXXXXXX';
+            } else if (selectedCountry === 'others') {
+                countryCodeBadge.classList.add('hidden');
+                contactNoInput.placeholder = '+__ 123456789';
+            } else {
+                const countryCode = countryCodes[selectedCountry];
+                if (countryCode) {
+                    countryCodeBadge.textContent = countryCode;
+                    countryCodeBadge.classList.remove('hidden');
+                    contactNoInput.placeholder = '123456789';
+                } else {
+                    countryCodeBadge.classList.add('hidden');
+                    contactNoInput.placeholder = '+__ 123456789';
+                }
+            }
+        }
+
+        // Turnover Currency Change
+        turnoverCurrencySelect.addEventListener('change', function() {
+            const currency = this.value;
+            if (currency === 'INR') {
+                turnoverHelperText.textContent = 'Enter value in Crores (e.g., 10.5 for ₹10.5 Crores)';
+            } else {
+                turnoverHelperText.textContent = 'Enter value in Millions (e.g., 2.5 for $2.5 Million)';
+            }
+        });
+
+        // File Upload Handling
+        fileUpload.addEventListener('change', function(e) {
+            handleFiles(e.target.files);
+        });
+
+        // Drag and Drop
+        fileDropZone.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            this.classList.add('drag-over');
+        });
+
+        fileDropZone.addEventListener('dragleave', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            this.classList.remove('drag-over');
+        });
+
+        fileDropZone.addEventListener('drop', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            this.classList.remove('drag-over');
+            handleFiles(e.dataTransfer.files);
+        });
+
+        fileDropZone.addEventListener('click', function() {
+            if (selectedFiles.length < 3) {
+                fileUpload.click();
+            }
+        });
+
+        // Clear All Files
+        clearAllFilesBtn.addEventListener('click', function() {
+            selectedFiles = [];
+            updateFileDisplay();
+        });
+
+        // Clear File Errors
+        clearFileErrorsBtn.addEventListener('click', function() {
+            fileErrors.classList.add('hidden');
+            fileErrors.innerHTML = '';
+        });
+
+        // Handle Files
+        function handleFiles(files) {
+            const allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+            const maxSize = 10 * 1024 * 1024; // 10MB
+            const errors = [];
+
+            // Check if adding these files would exceed the limit
+            if (selectedFiles.length + files.length > 3) {
+                errors.push(`Maximum 3 files allowed. You can select ${3 - selectedFiles.length} more.`);
+                displayFileErrors(errors);
+                return;
+            }
+
+            Array.from(files).forEach(file => {
+                if (!allowedTypes.includes(file.type)) {
+                    errors.push(`File "${file.name}" has an invalid format. Only PDF and Word documents (DOC/DOCX) are allowed.`);
+                } else if (file.size > maxSize) {
+                    errors.push(`File "${file.name}" is too large (Max 10MB).`);
+                } else {
+                    selectedFiles.push(file);
+                }
+            });
+
+            if (errors.length > 0) {
+                displayFileErrors(errors);
+            }
+
+            updateFileDisplay();
+        }
+
+        // Display File Errors
+        function displayFileErrors(errors) {
+            fileErrors.classList.remove('hidden');
+            fileErrors.innerHTML = errors.map(error => `
+                <div class="text-sm text-destructive flex items-center gap-1 mb-1">
+                    <i data-lucide="alert-circle" class="w-3 h-3"></i>
+                    <span>${error}</span>
+                </div>
+            `).join('') + `
+                <button type="button" id="clear-file-errors" class="text-xs text-muted-foreground mt-1 hover:text-foreground transition-colors">
+                    Clear errors
+                </button>
+            `;
+            
+            // Re-initialize icons and event listener
+            lucide.createIcons();
+            document.getElementById('clear-file-errors').addEventListener('click', function() {
+                fileErrors.classList.add('hidden');
+                fileErrors.innerHTML = '';
+            });
+        }
+
+        // Update File Display
+        function updateFileDisplay() {
+            // Update counter
+            fileCounter.textContent = selectedFiles.length > 0 ? `${selectedFiles.length} of 3 files selected` : 'No files selected';
+            
+            // Show/hide clear all button
+            if (selectedFiles.length > 0) {
+                clearAllFilesBtn.classList.remove('hidden');
+            } else {
+                clearAllFilesBtn.classList.add('hidden');
+            }
+
+            // Update preview
+            if (selectedFiles.length > 0) {
+                uploadPlaceholder.classList.add('hidden');
+                filePreview.classList.remove('hidden');
+                
+                filePreview.innerHTML = selectedFiles.map((file, index) => {
+                    const fileType = file.type;
+                    let fileIcon = '';
+                    let fileColor = '';
+
+                    if (fileType === 'application/pdf') {
+                        fileIcon = 'file-text';
+                        fileColor = 'text-red-500';
+                    } else if (fileType.includes('word')) {
+                        fileIcon = 'file-text';
+                        fileColor = 'text-blue-500';
+                    } else {
+                        fileIcon = 'file';
+                        fileColor = 'text-gray-500';
+                    }
+
+                    return `
+                        <div class="file-item">
+                            <div class="mb-2 relative w-full h-24 flex items-center justify-center">
+                                <i data-lucide="${fileIcon}" class="h-10 w-10 ${fileColor}"></i>
+                            </div>
+                            <div class="text-center w-full">
+                                <p class="text-xs font-medium text-foreground truncate max-w-full px-1">
+                                    ${file.name}
+                                </p>
+                                <p class="text-xs text-muted-foreground mt-0.5">
+                                    ${(file.size / 1024 / 1024).toFixed(2)} MB
+                                </p>
+                            </div>
+                            <button type="button" class="file-remove-btn" onclick="removeFile(${index})">
+                                <i data-lucide="x" class="w-3 h-3"></i>
+                            </button>
+                        </div>
+                    `;
+                }).join('');
+
+                // Add "Add More" placeholder if under limit
+                if (selectedFiles.length < 3) {
+                    filePreview.innerHTML += `
+                        <div class="flex flex-col items-center justify-center p-3 bg-muted/30 dark:bg-neutral-800/30 backdrop-blur-sm rounded-lg border border-dashed border-border/50 dark:border-neutral-700/30 cursor-pointer hover:bg-muted/50 dark:hover:bg-neutral-800/50 transition-colors" onclick="document.getElementById('file-upload').click()">
+                            <i data-lucide="plus" class="h-10 w-10 text-muted-foreground/50 mb-2"></i>
+                            <p class="text-xs text-muted-foreground">Add file</p>
+                        </div>
+                    `;
+                }
+
+                lucide.createIcons();
+            } else {
+                uploadPlaceholder.classList.remove('hidden');
+                filePreview.classList.add('hidden');
+            }
+        }
+
+        // Remove File
+        function removeFile(index) {
+            selectedFiles.splice(index, 1);
+            updateFileDisplay();
+        }
+
+        // Form Validation
+        function validateForm() {
+            let isValid = true;
+            const errors = [];
+
+            // Clear previous errors
+            document.querySelectorAll('.form-error').forEach(error => {
+                error.classList.add('hidden');
+            });
+
+            // Required fields validation
+            const requiredFields = [
+                { id: 'name', message: 'Full name is required' },
+                { id: 'designation', message: 'Designation is required' },
+                { id: 'companyName', message: 'Company name is required' },
+                { id: 'firmType', message: 'Please select a firm type' },
+                { id: 'country', message: 'Country is required' },
+                { id: 'contactNo', message: 'Contact number is required' },
+                { id: 'email', message: 'Email is required' },
+                { id: 'category', message: 'Please select a category' },
+                { id: 'productDescription', message: 'Description is required' },
+                { id: 'turnover', message: 'Turnover value is required' }
+            ];
+
+            requiredFields.forEach(field => {
+                const element = document.getElementById(field.id);
+                const errorElement = document.getElementById(`${field.id}-error`);
+                
+                if (!element.value.trim()) {
+                    errorElement.classList.remove('hidden');
+                    errorElement.querySelector('span').textContent = field.message;
+                    isValid = false;
+                }
+            });
+
+            // Email validation
+            const emailField = document.getElementById('email');
+            const emailError = document.getElementById('email-error');
+            const emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
+            
+            if (emailField.value && !emailRegex.test(emailField.value)) {
+                emailError.classList.remove('hidden');
+                emailError.querySelector('span').textContent = 'Invalid email address format';
+                isValid = false;
+            }
+
+            // Website validation - only if a value is provided
+            const websiteField = document.getElementById('website');
+            const websiteError = document.getElementById('website-error');
+            const urlRegex = /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?$/;
+            
+            if (websiteField.value && !urlRegex.test(websiteField.value)) {
+                websiteError.classList.remove('hidden');
+                websiteError.querySelector('span').textContent = 'Please enter a valid URL if providing a website (e.g., https://example.com)';
+                isValid = false;
+            }
+
+            // Contact number validation
+            const contactNoField = document.getElementById('contactNo');
+            const contactNoError = document.getElementById('contactNo-error');
+            const vendorType = document.getElementById('vendorType').value;
+            
+            if (contactNoField.value) {
+                if (vendorType === 'domestic') {
+                    if (!contactNoField.value.startsWith('+91 ')) {
+                        contactNoError.classList.remove('hidden');
+                        contactNoError.querySelector('span').textContent = 'Number must start with +91 for domestic vendors';
+                        isValid = false;
+                    } else {
+                        const numberPart = contactNoField.value.replace('+91 ', '');
+                        if (!/^\d{10}$/.test(numberPart)) {
+                            contactNoError.classList.remove('hidden');
+                            contactNoError.querySelector('span').textContent = 'Please enter a valid 10-digit number after +91';
+                            isValid = false;
+                        }
+                    }
+                } else {
+                    if (!/^[+\d\s]+$/.test(contactNoField.value)) {
+                        contactNoError.classList.remove('hidden');
+                        contactNoError.querySelector('span').textContent = 'Please enter only numbers, spaces, and + sign';
+                        isValid = false;
+                    }
+                }
+            }
+
+            // Product description minimum length
+            const productDescField = document.getElementById('productDescription');
+            const productDescError = document.getElementById('productDescription-error');
+            
+            if (productDescField.value && productDescField.value.length < 20) {
+                productDescError.classList.remove('hidden');
+                productDescError.querySelector('span').textContent = 'Please provide a more detailed description (min 20 chars).';
+                isValid = false;
+            }
+
+            // Turnover validation
+            const turnoverField = document.getElementById('turnover');
+            const turnoverError = document.getElementById('turnover-error');
+            
+            if (turnoverField.value && !/^[0-9]*\.?[0-9]*$/.test(turnoverField.value)) {
+                turnoverError.classList.remove('hidden');
+                turnoverError.querySelector('span').textContent = 'Please enter only numbers (e.g., 10.5)';
+                isValid = false;
+            }
+
+            // Terms checkbox validation
+            const termsCheckbox = document.getElementById('terms');
+            const termsError = document.getElementById('terms-error');
+            
+            if (!termsCheckbox.checked) {
+                termsError.classList.remove('hidden');
+                termsError.querySelector('span').textContent = 'You must agree to the terms and conditions';
+                isValid = false;
+            }
+
+            return isValid;
+        }
+
+        // Form Submission
+        vendorForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            if (isSubmitting) return;
+            
+            if (!validateForm()) {
+                return;
+            }
+
+            isSubmitting = true;
+            
+            // Update submit button
+            submitBtn.disabled = true;
+            submitText.textContent = 'Processing Submission...';
+            submitIcon.setAttribute('data-lucide', 'loader-2');
+            submitIcon.classList.add('animate-spin');
+            lucide.createIcons();
+
+            // Show upload progress if files are present
+            if (selectedFiles.length > 0) {
+                uploadProgress.classList.remove('hidden');
+                
+                // Simulate file upload progress
+                let progress = 0;
+                const progressInterval = setInterval(() => {
+                    progress += Math.random() * 30;
+                    if (progress > 90) progress = 90;
+                    
+                    progressBar.style.width = `${progress}%`;
+                    progressText.textContent = Math.round(progress);
+                }, 200);
+
+                // Complete progress after 2 seconds
+                setTimeout(() => {
+                    clearInterval(progressInterval);
+                    progressBar.style.width = '100%';
+                    progressText.textContent = '100';
+                }, 2000);
+            }
+
+            try {
+                // Prepare form data for EmailJS
+                const formData = new FormData(vendorForm);
+                const emailData = {
+                    name: formData.get('name'),
+                    designation: formData.get('designation'),
+                    companyName: formData.get('companyName'),
+                    firmType: formData.get('firmType'),
+                    vendorType: formData.get('vendorType'),
+                    country: formData.get('country'),
+                    website: formData.get('website') || 'Not provided',
+                    contactNo: formData.get('contactNo'),
+                    email: formData.get('email'),
+                    category: formData.get('category'),
+                    productDescription: formData.get('productDescription'),
+                    majorClients: formData.get('majorClients') || 'Not provided',
+                    turnover: formData.get('turnover'),
+                    turnoverCurrency: formData.get('turnoverCurrency'),
+                    fileCount: selectedFiles.length,
+                    submissionDate: new Date().toLocaleString(),
+                    tokenId: `TOKEN-${Date.now().toString().slice(-6)}`
+                };
+
+                // Format turnover
+                const turnoverText = emailData.turnoverCurrency === 'INR' 
+                    ? `₹${emailData.turnover} Crores`
+                    : `$${emailData.turnover} Million`;
+                emailData.formattedTurnover = turnoverText;
+
+                // Send auto-reply email to vendor
+                console.log('Sending confirmation email to vendor...');
+                const vendorEmailResult = await emailjs.send(
+                    'service_1eug2fiprocureme', // ✅ Your correct EmailJS service ID
+                    'template_o3eczdr', // ✅ Vendor auto-reply template ID
+                    emailData
+                );
+                console.log('Vendor confirmation email sent:', vendorEmailResult);
+
+                // Send notification email to team
+                console.log('Sending notification email to team...');
+                const teamEmailResult = await emailjs.send(
+                    'service_1eug2fiprocureme', // ✅ Your correct EmailJS service ID
+                    'template_g1x94wp', // ✅ Team notification template ID
+                    emailData
+                );
+                console.log('Team notification email sent:', teamEmailResult);
+
+                // Simulate processing delay
+                await new Promise(resolve => setTimeout(resolve, 1000));
+
+                // Show success state
+                showSuccessState();
+
+            } catch (error) {
+                console.error('Error sending email:', error);
+                
+                // Show user-friendly error message
+                alert('There was an issue sending your submission. Please try again or contact us directly at anoop.singh@rashmigroup.com');
+                
+            } finally {
+                isSubmitting = false;
+                uploadProgress.classList.add('hidden');
+                
+                // Reset submit button
+                submitBtn.disabled = false;
+                submitText.textContent = 'Submit Profile';
+                submitIcon.setAttribute('data-lucide', 'check');
+                submitIcon.classList.remove('animate-spin');
+                lucide.createIcons();
+            }
+        });
+
+        // Show Success State
+        function showSuccessState() {
+            // Scroll to top smoothly
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            
+            // After scroll completes, show success state
+            setTimeout(() => {
+                formContainer.classList.add('hidden');
+                successState.classList.remove('hidden');
+            }, 500);
+        }
+
+        // Submit Another Profile
+        submitAnotherBtn.addEventListener('click', function() {
+            // Reset form
+            vendorForm.reset();
+            selectedFiles = [];
+            updateFileDisplay();
+            
+            // Reset vendor type to domestic
+            vendorTypeInput.value = 'domestic';
+            vendorTypeLabel.textContent = 'Domestic Vendor';
+            vendorTypeDescription.textContent = 'For vendors based in India';
+            switchButton.classList.remove('translate-x-6');
+            vendorTypeSwitch.classList.remove('bg-blue-600');
+            vendorTypeSwitch.classList.add('bg-gray-200');
+            countrySelect.disabled = true;
+            countrySelect.classList.add('opacity-80');
+            countrySelect.value = 'in';
+            contactNoInput.value = '+91 ';
+            updateCountryCode();
+            
+            // Reset turnover currency
+            turnoverCurrencySelect.value = 'INR';
+            turnoverHelperText.textContent = 'Enter value in Crores (e.g., 10.5 for ₹10.5 Crores)';
+            
+            // Hide custom country fields
+            customCountryFields.classList.add('hidden');
+            
+            // Clear all errors
+            document.querySelectorAll('.form-error').forEach(error => {
+                error.classList.add('hidden');
+            });
+            fileErrors.classList.add('hidden');
+            
+            // Show form, hide success state
+            successState.classList.add('hidden');
+            formContainer.classList.remove('hidden');
+            
+            // Scroll to form
+            document.getElementById('registration-form').scrollIntoView({ behavior: 'smooth' });
+        });
+
+        // Parallax Effect
+        let ticking = false;
+        function updateParallax() {
+            const scrollY = window.pageYOffset;
+            const parallaxElements = document.querySelectorAll('.parallax-bg');
+            
+            parallaxElements.forEach(element => {
+                const speed = parseFloat(element.dataset.speed || '0.3');
+                element.style.transform = `translateY(${scrollY * speed}px)`;
+            });
+            
+            ticking = false;
+        }
+
+        function requestParallaxUpdate() {
+            if (!ticking) {
+                requestAnimationFrame(updateParallax);
+                ticking = true;
+            }
+        }
+
+        window.addEventListener('scroll', requestParallaxUpdate, { passive: true });
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize icons
+            lucide.createIcons();
+            
+            // Set default values
+            updateCountryCode();
+            updateFileDisplay();
+            
+            // Initialize parallax
+            updateParallax();
+        });
+
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+    </script>
+</body>
+</html> 
