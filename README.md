@@ -83,6 +83,36 @@ npm run deploy
 
 For the backend, you can deploy to any Node.js hosting service (e.g., Heroku, Vercel, Netlify).
 
+## Deployment Information
+
+This project is deployed on Vercel as a full-stack application with a React frontend and Node.js backend. The application is designed to handle vendor registration and submission processes for Rashmi Metaliks.
+
+### Key Components:
+
+- **Frontend**: React, TypeScript, Vite, Tailwind CSS
+- **Backend**: Node.js, Express, TypeScript
+- **Deployment**: Vercel
+
+### Important Build Commands:
+
+```bash
+# Install dependencies
+npm run install:all
+
+# Build both frontend and backend
+npm run build
+
+# Start the application
+npm start
+
+# Development mode
+npm run dev
+```
+
+### Vercel Configuration:
+
+The application is configured to deploy both frontend and backend components to Vercel using the vercel.json configuration file. API routes are properly mapped to the backend serverless functions.
+
 ## API Endpoints
 
 ### POST /api/vendors
