@@ -14,7 +14,7 @@
     "install:backend": "cd backend && npm install",
     "install:frontend": "cd frontend && npm install",
     "deploy": "gh-pages -d frontend/dist",
-    "vercel-build": "npm install && npm run build"
+    "vercel-build": "npm install -g typescript && npm install && npm run build"
   },
   "keywords": [
     "vendor",
@@ -33,6 +33,7 @@
   "dependencies": {
     "@radix-ui/react-dropdown-menu": "^2.1.15",
     "@radix-ui/react-slot": "^1.2.3",
-    "class-variance-authority": "^0.7.1"
+    "class-variance-authority": "^0.7.1",
+    "typescript": "^5.2.2"
   }
 }
