@@ -1,8 +1,8 @@
 import axios from 'axios';
 
 // Determine the base URL based on environment
-const isDevelopment = import.meta.env.DEV;
-const baseURL = isDevelopment 
+const isDevelopment = import.meta.env.MODE === 'development';
+const baseURL = isDevelopment
   ? 'http://localhost:5000/api' // Development environment
   : '/api';                      // Production environment (relative path)
 
@@ -15,4 +15,4 @@ const api = axios.create({
   timeout: 30000, // 30 seconds timeout
 });
 
-export default api; 
+export default api;
