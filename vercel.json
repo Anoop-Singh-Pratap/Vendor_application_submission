@@ -1,0 +1,41 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "frontend/package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "dist"
+      }
+    },
+    {
+      "src": "backend/src/index.ts",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/backend/src/index.ts"
+    },
+    {
+      "handle": "filesystem"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/frontend/dist/$1"
+    }
+  ],
+  "functions": {
+    "backend/src/index.ts": {
+      "includeFiles": "backend/src/**"
+    }
+  },
+  "env": {
+    "NODE_ENV": "production",
+    "EMAIL_HOST": "smtp.office365.com",
+    "EMAIL_PORT": "587",
+    "EMAIL_SECURE": "false",
+    "EMAIL_USER": "procurement@rashmigroup.com"
+  }
+}
