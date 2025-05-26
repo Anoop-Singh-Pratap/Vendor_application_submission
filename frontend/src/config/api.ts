@@ -1,10 +1,7 @@
 import axios from 'axios';
 
-// Determine the base URL based on environment
-const isDevelopment = import.meta.env.MODE === 'development';
-const baseURL = isDevelopment
-  ? 'http://localhost:5000/api' // Development environment
-  : '/api';                      // Production environment (relative path)
+// Use relative path for API calls (works in both dev and production)
+const baseURL = '/api';
 
 // Create axios instance with common configuration
 const api = axios.create({
