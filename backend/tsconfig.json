@@ -4,7 +4,7 @@
     "module": "CommonJS",
     "outDir": "./dist",
     "rootDir": "./src",
-    "strict": true,
+    "strict": false,
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
@@ -12,6 +12,8 @@
     "typeRoots": ["./node_modules/@types", "./src/types"],
     "types": ["node", "express", "nodemailer", "multer", "cors"],
     "noImplicitAny": false,
+    "allowJs": true,
+    "checkJs": false,
     "lib": ["ES2018", "DOM"]
   },
   "include": ["src/**/*"],
