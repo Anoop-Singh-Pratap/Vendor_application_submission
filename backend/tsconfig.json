@@ -9,8 +9,7 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
-    "typeRoots": ["./node_modules/@types", "./src/types"],
-    "types": ["node", "express", "nodemailer", "multer", "cors"],
+    "typeRoots": ["./node_modules/@types"],
     "noImplicitAny": false,
     "allowJs": true,
     "checkJs": false,
@@ -18,4 +17,4 @@
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"]
-} 
+}

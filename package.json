@@ -14,7 +14,7 @@
     "install:backend": "cd backend && npm install",
     "install:frontend": "cd frontend && npm install",
     "deploy": "gh-pages -d frontend/dist",
-    "vercel-build": "npm install -g typescript && npm install && cd backend && npm install @types/node @types/express @types/nodemailer @types/multer @types/cors && cd .. && npm run build"
+    "vercel-build": "npm run install:all && npm run build"
   },
   "keywords": [
     "vendor",
