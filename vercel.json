@@ -1,54 +1,6 @@
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "package.json",
-      "use": "@vercel/node",
-      "config": {
-        "buildCommand": "npm run vercel-build",
-        "outputDirectory": "frontend/dist"
-      }
-    },
-    {
-      "src": "backend/src/index.ts",
-      "use": "@vercel/node"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "/backend/src/index.ts"
-    },
-    {
-      "src": "^/assets/(.*)",
-      "dest": "/frontend/dist/assets/$1"
-    },
-    {
-      "src": "^/favicon.ico",
-      "dest": "/frontend/dist/favicon.ico"
-    },
-    {
-      "handle": "filesystem"
-    },
-    {
-      "src": "^/$",
-      "dest": "/frontend/dist/index.html"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/frontend/dist/index.html"
-    }
-  ],
-  "functions": {
-    "backend/src/index.ts": {
-      "includeFiles": "backend/src/**"
-    }
-  },
-  "env": {
-    "NODE_ENV": "production",
-    "EMAIL_HOST": "smtp.office365.com",
-    "EMAIL_PORT": "587",
-    "EMAIL_SECURE": "false",
-    "EMAIL_USER": "procurement@rashmigroup.com"
-  }
+  "buildCommand": "npm run vercel-build",
+  "outputDirectory": "frontend/dist",
+  "installCommand": "npm install"
 }
