@@ -14,7 +14,7 @@
     "install:backend": "cd backend && npm install",
     "install:frontend": "cd frontend && npm install",
     "deploy": "gh-pages -d frontend/dist",
-    "vercel-build": "npm run build:frontend && npm run build:backend"
+    "vercel-build": "npm install && npm run build"
   },
   "keywords": [
     "vendor",
@@ -27,7 +27,8 @@
   "license": "ISC",
   "devDependencies": {
     "concurrently": "^8.2.2",
-    "gh-pages": "^6.0.0"
+    "gh-pages": "^6.0.0",
+    "typescript": "^5.2.2"
   },
   "dependencies": {
     "@radix-ui/react-dropdown-menu": "^2.1.15",
