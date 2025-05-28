@@ -330,6 +330,7 @@ const VendorRegistration: React.FC = () => {
   const [isDragging, setIsDragging] = useState(false);
   const [customCountry, setCustomCountry] = useState('');
   const [customCountryCode, setCustomCountryCode] = useState(''); // Should store with '+' e.g. "+123"
+  const [countrySearchQuery, setCountrySearchQuery] = useState(""); // State for country search
 
   // Form setup
   const { register, handleSubmit, control, formState: { errors, isSubmitting }, reset, watch, setValue, trigger } = useForm<VendorFormData>({
@@ -634,14 +635,15 @@ const VendorRegistration: React.FC = () => {
     return countryData?.countryCode || '';
   }, [isDomestic, isOtherCountrySelected, watchedCountry, customCountryCode]);
 
-  const contactPlaceholder = useMemo(() => {
-    if (isDomestic) return 'XXXXXXXXXX (10 digits)';
-    if (activeDialCode) return `${activeDialCode} Your Number`;
-    return '+__ Your Number';
-  }, [isDomestic, activeDialCode]);
-
   const shouldShowCountryCodeBadge = !isDomestic && !!activeDialCode;
 
+  const contactPlaceholder = useMemo(() => {
+    if (isDomestic) return 'XXXXXXXXXX (10 digits)';
+    // If badge is shown, placeholder should not include the code again
+    if (shouldShowCountryCodeBadge) return 'Your Number';
+    if (activeDialCode) return `${activeDialCode} Your Number`;
+    return '+__ Your Number';
+  }, [isDomestic, activeDialCode, shouldShowCountryCodeBadge]); // Added shouldShowCountryCodeBadge dependency
 
   // Cleanup object URLs on unmount
   useEffect(() => {
@@ -667,72 +669,101 @@ const VendorRegistration: React.FC = () => {
     const currentVendorType = watchedVendorType;
     const currentCountry = watchedCountry;
     
-    let newTargetCountryForField = currentCountry; // what country field should be
-    let newTargetPhonePrefix = ""; // what phone prefix should be
+    let newTargetCountryForField = currentCountry; 
+    let newTargetPhonePrefix = ""; 
 
     if (currentVendorType === 'domestic') {
         newTargetPhonePrefix = '+91';
         if (currentCountry !== 'in') {
             newTargetCountryForField = 'in';
         }
-    } else { // Global
-        if (currentCountry === 'in') { // If was domestic (India) and switched to global
+    } else { 
+        if (currentCountry === 'in') { 
             const usCountryData = countries.find(c => c.code === 'us');
             if (usCountryData) {
-                newTargetCountryForField = 'us'; // Default to US
+                newTargetCountryForField = 'us'; 
                 newTargetPhonePrefix = usCountryData.countryCode;
-            } else { // Fallback if US not found (should not happen with current data)
+            } else { 
                 newTargetCountryForField = ''; 
                 newTargetPhonePrefix = '';
             }
         } else if (currentCountry === 'others') {
             newTargetCountryForField = 'others';
-            newTargetPhonePrefix = customCountryCode; // This should have '+'
+            newTargetPhonePrefix = customCountryCode; 
         } else if (currentCountry) {
             const countryData = countries.find(c => c.code === currentCountry);
             newTargetPhonePrefix = countryData?.countryCode || '';
         } else {
-             newTargetPhonePrefix = ''; // No country selected for global
+             newTargetPhonePrefix = ''; 
         }
     }
     
-    // Update country form field if it needs to change
     if (watch('country') !== newTargetCountryForField && newTargetCountryForField) {
         setValue('country', newTargetCountryForField, { shouldValidate: true, shouldDirty: (watch('country') !== newTargetCountryForField) });
     }
 
-    // Update contact number prefix
     const currentPhoneVal = watch('contactNo');
     const currentPhoneTrimmed = currentPhoneVal ? currentPhoneVal.trim() : "";
+    const currentShouldShowBadge = !isDomestic && !!newTargetPhonePrefix && currentCountry !== 'in';
 
-    if (newTargetPhonePrefix) { // If a target prefix is determined
+
+    if (newTargetPhonePrefix) {
         const prefixWithSpace = newTargetPhonePrefix + ' ';
-        if (currentPhoneTrimmed === '' || currentPhoneTrimmed === newTargetPhonePrefix) {
-            // If phone is empty or exactly the prefix (no national number), set it
-            if (currentPhoneVal !== prefixWithSpace) { // Avoid redundant update
+        // If the badge will be shown for the new prefix AND the current national number part is empty
+        if (currentShouldShowBadge && (currentPhoneTrimmed === '' || currentPhoneTrimmed === newTargetPhonePrefix || (currentPhoneVal.startsWith(newTargetPhonePrefix) && currentPhoneVal.replace(newTargetPhonePrefix, '').trim() === ''))) {
+            if (watch('contactNo') !== '') { // Avoid re-setting if already empty
+                 setValue('contactNo', '', { shouldValidate: true }); // Set to empty string; placeholder will guide.
+            }
+        } else if (!currentShouldShowBadge && (currentPhoneTrimmed === '' || currentPhoneTrimmed === newTargetPhonePrefix)) {
+            // Badge is not shown, and phone is empty or just the prefix, so prefill with prefix + space
+            if (watch('contactNo') !== prefixWithSpace) {
                  setValue('contactNo', prefixWithSpace, { shouldValidate: true });
             }
-        } else if (!currentPhoneVal.startsWith(newTargetPhonePrefix)) {
-            // Phone has content but not the right prefix. Preserve national number.
-            const nationalNumber = currentPhoneVal.replace(/^\+\d*\s*/, '').trim(); // Strip any old prefix-like part
-            if (nationalNumber === '') { // It was just an old prefix
-                 if (currentPhoneVal !== prefixWithSpace) { // Avoid redundant update
+        } else if (!currentPhoneVal.startsWith(newTargetPhonePrefix) && newTargetPhonePrefix) {
+            // Phone has content but not the right prefix, or prefix is changing. Preserve national number.
+            const nationalNumber = currentPhoneVal.replace(/^\+\d*\s*/, '').trim();
+            if (currentShouldShowBadge) {
+                // If badge is shown, set input to just the national number if it exists, otherwise empty.
+                // The full number for react-hook-form state is handled by handlePhoneChange.
+                // This ensures the display is clean.
+                if (nationalNumber === '' && watch('contactNo') !== '') {
+                     setValue('contactNo', '', { shouldValidate: true});
+                } else if (nationalNumber !== '' && watch('contactNo') !== nationalNumber) {
+                    // This line would make the RHF state `nationalNumber` which is not desired.
+                    // The RHF state should be the full number.
+                    // The current issue is about *pre-fill*. `formatPhoneNumber` will ensure RHF has full number.
+                    // Let's ensure the RHF value is set correctly.
+                    setValue('contactNo', formatPhoneNumber(nationalNumber, newTargetPhonePrefix), {shouldValidate: true});
+                }
+            } else if (nationalNumber === '') { // No badge, national number was empty (it was just an old prefix)
+                 if (watch('contactNo') !== prefixWithSpace) {
                     setValue('contactNo', prefixWithSpace, { shouldValidate: true });
                  }
-            } else {
+            } else { // No badge, has national number, format with new prefix
                 setValue('contactNo', formatPhoneNumber(nationalNumber, newTargetPhonePrefix), { shouldValidate: true });
             }
         }
-        // If currentPhoneVal already starts with newTargetPhonePrefix, user is likely typing the national part.
-        // handlePhoneChange will take care of formatting it.
     } else if (currentVendorType === 'global' && currentPhoneTrimmed === '') {
         // Global, no specific prefix yet (e.g. "select country" or "others" with no custom code)
         // and phone is empty.
-        setValue('contactNo', '+ ', { shouldValidate: true }); // Default to "+ " to indicate intl. prefix needed
+        if (currentShouldShowBadge && watch('contactNo') !== '') { // If a badge *would* be shown with a future prefix
+             setValue('contactNo', '', { shouldValidate: true });
+        } else if (!currentShouldShowBadge && watch('contactNo') !== '+ ') {
+            setValue('contactNo', '+ ', { shouldValidate: true }); 
+        }
     }
 
-  }, [watchedVendorType, watchedCountry, customCountryCode, setValue, watch]);
+  }, [watchedVendorType, watchedCountry, customCountryCode, setValue, watch, isDomestic]); // Added isDomestic
 
+
+  const filteredCountries = useMemo(() => {
+    if (!countrySearchQuery) {
+      return countries;
+    }
+    return countries.filter(country =>
+      country.name.toLowerCase().includes(countrySearchQuery.toLowerCase())
+    );
+  }, [countrySearchQuery]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-gray-50 to-blue-50/30 dark:from-neutral-950 dark:via-neutral-900 dark:to-blue-950/30">
@@ -1156,14 +1187,15 @@ const VendorRegistration: React.FC = () => {
                                           setCustomCountry('');
                                           setCustomCountryCode('');
                                         }
-                                        trigger("contactNo"); // Re-validate phone when country changes
+                                        setCountrySearchQuery(''); // Reset search on select
+                                        trigger("contactNo"); 
                                       }}
                                       defaultValue={field.value}
                                       value={field.value || ""}
                                       disabled={watchedVendorType === 'domestic'}
                                     >
                                       <SelectTrigger
-                                        id="country-select" // More specific ID
+                                        id="country-select" 
                                         aria-invalid={errors.country ? "true" : "false"}
                                         className={cn(
                                           "bg-background/70",
@@ -1171,10 +1203,9 @@ const VendorRegistration: React.FC = () => {
                                         )}
                                       >
                                         <div className="flex items-center gap-2">
-                                          {field.value && field.value !== 'others' && (
+                                          {field.value && field.value !== 'others' && countries.find(c => c.code === field.value) && (
                                             <span className="inline-block w-5 text-center">
-                                              {/* Simplified emoji logic, can be expanded */}
-                                              { {'in': '🇮🇳', 'us': '🇺🇸', 'gb': '🇬🇧', 'ca': '🇨🇦', 'au': '🇦🇺', 'jp': '🇯🇵', 'cn': '🇨🇳', 'de': '🇩🇪'}[field.value] || '🌍'}
+                                              { {'in': '🇮🇳', 'us': '🇺🇸', 'gb': '🇬🇧', 'ca': '🇨🇦', 'au': '🇦🇺', 'jp': '🇯🇵', 'cn': '🇨🇳', 'de': '🇩🇪', 'ae': '🇦🇪', 'sg': '🇸🇬', 'za': '🇿🇦'}[field.value as string] || '🌍'}
                                             </span>
                                           )}
                                           <SelectValue placeholder="Select country..." />
@@ -1182,9 +1213,14 @@ const VendorRegistration: React.FC = () => {
                                       </SelectTrigger>
                                       <SelectContent className="max-h-80">
                                           <div className="p-2 sticky top-0 bg-background z-10 border-b">
-                                              {/* Search input for countries (client-side filter example) */}
+                                              <Input
+                                                placeholder="Search country..."
+                                                value={countrySearchQuery}
+                                                onChange={(e) => setCountrySearchQuery(e.target.value)}
+                                                className="bg-background/70"
+                                              />
                                           </div>
-                                        {countries.map(country => (
+                                        {filteredCountries.map(country => (
                                           <SelectItem
                                             key={country.code}
                                             value={country.code}
@@ -1192,7 +1228,6 @@ const VendorRegistration: React.FC = () => {
                                             data-country-name={country.name}
                                             className="cursor-pointer"
                                           >
-                                            {/* ... (country item display logic from original) ... */}
                                             <div className="flex items-center justify-between">
                                               <span>{country.name}</span>
                                               {country.code !== 'others' && <span className="text-xs text-muted-foreground">{country.countryCode}</span>}
@@ -1286,7 +1321,10 @@ const VendorRegistration: React.FC = () => {
                                   id="contactNo"
                                   type="tel"
                                   placeholder={contactPlaceholder}
-                                  className="bg-background/70 dark:bg-neutral-800/50 focus:ring-offset-0 focus:ring-rashmi-red/50 focus:border-rashmi-red/80 flex-1"
+                                  className={cn(
+                                    "bg-background/70"
+                                    // Removed conditional padding, flex layout handles it.
+                                  )}
                                   {...register("contactNo", {
                                     required: "Contact number is required",
                                     validate: value => {
@@ -1627,7 +1665,10 @@ const VendorRegistration: React.FC = () => {
         </div>
       </motion.section>
 
-      {/* Benefits Section */}
+      {/* ============================
+          Enhanced Benefits Section - Add more internal links and optimize keywords
+      ============================ */}
+      {/* Commented out Review Process section as requested
       <section
         className="py-24 relative bg-gradient-to-b from-blue-50/20 to-background dark:from-blue-950/20 dark:to-neutral-950 overflow-hidden"
         style={{
@@ -1640,14 +1681,14 @@ const VendorRegistration: React.FC = () => {
         <div className="absolute inset-0 z-0 pointer-events-none opacity-60">
           <div className="absolute -right-[5%] top-[10%] w-1/3 h-1/2 bg-rashmi-red/5 dark:bg-rashmi-red/10 rounded-full blur-3xl opacity-50 parallax-bg" data-speed="0.1"></div>
           <div className="absolute -left-[10%] bottom-[5%] w-1/2 h-1/2 bg-blue-500/5 dark:bg-blue-900/10 rounded-full blur-3xl opacity-40 parallax-bg" data-speed="-0.15"></div>
-          <svg className="absolute inset-0 h-full w-full stroke-gray-300/20 dark:stroke-neutral-700/20 [mask-image:radial-gradient(100%_100%_at_center_center,white,transparent)]" aria-hidden="true">
+           <svg className="absolute inset-0 h-full w-full stroke-gray-300/20 dark:stroke-neutral-700/20 [mask-image:radial-gradient(100%_100%_at_center_center,white,transparent)]" aria-hidden="true">
             <defs>
-              <pattern id="benefits-pattern" width="60" height="60" x="50%" y="-1" patternUnits="userSpaceOnUse">
+                <pattern id="benefits-pattern" width="60" height="60" x="50%" y="-1" patternUnits="userSpaceOnUse">
                 <path d="M.5 60 V.5 H60" fill="none"/>
-              </pattern>
+                </pattern>
             </defs>
             <rect width="100%" height="100%" strokeWidth="0" fill="url(#benefits-pattern)"/>
-          </svg>
+           </svg>
         </div>
 
         <div className="container mx-auto px-4 relative z-10">
@@ -1666,7 +1707,7 @@ const VendorRegistration: React.FC = () => {
             <motion.h2
               id="benefits-heading"
               variants={fadeInUp}
-              className="text-4xl md:text-5xl font-bold tracking-tight mb-5 text-foreground"
+              className="text-4xl md:text-5xl font-display font-bold tracking-tight mb-5 text-foreground"
             >
               Why Submit Your Profile?
             </motion.h2>
@@ -1677,41 +1718,113 @@ const VendorRegistration: React.FC = () => {
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
             {[
-              { title: "Expand Your Reach", description: "Access new markets and large-scale projects through our extensive network and ongoing tenders for ductile iron pipes and infrastructure projects.", icon: TrendingUp, color: "from-blue-500/10 to-blue-600/5 dark:from-blue-800/20 dark:to-blue-900/10", ariaLabel: "Expand market reach" },
-              { title: "Streamlined Procurement", description: "Experience efficient digital processes, clear communication, and a dedicated vendor portal with our world-class procurement team.", icon: CheckCircle, color: "from-rashmi-red/10 to-red-600/5 dark:from-rashmi-red/20 dark:to-red-900/10", ariaLabel: "Streamlined procurement" },
-              { title: "Reliable & Timely Payments", description: "Benefit from structured payment cycles and financial predictability with Rashmi Metaliks, fostering a stable partnership for long-term growth.", icon: ShieldCheck, color: "from-emerald-500/10 to-green-600/5 dark:from-emerald-800/20 dark:to-green-900/10", ariaLabel: "Reliable payments" },
-              { title: "Long-Term Growth", description: "Become a preferred partner and scale your business alongside our expanding operations and projects in the steel and iron industry.", icon: Award, color: "from-amber-500/10 to-yellow-600/5 dark:from-amber-800/20 dark:to-yellow-900/10", ariaLabel: "Long-term growth" },
-              { title: "Innovation Synergy", description: "Collaborate on new steel and iron solutions, gain early access to requirements, and contribute to DI pipe and infrastructure advancements.", icon: Upload /* Globe or Lightbulb might be better */, color: "from-indigo-500/10 to-purple-600/5 dark:from-indigo-800/20 dark:to-purple-900/10", ariaLabel: "Innovation synergy" },
-              { title: "Sustainable Partnership", description: "Align with our commitment to responsible sourcing, ethical practices, and environmental stewardship in the metals manufacturing industry.", icon: Globe /* ShieldCheck or CheckCircle also fit */, color: "from-teal-500/10 to-cyan-600/5 dark:from-teal-800/20 dark:to-cyan-900/10", ariaLabel: "Sustainable partnership" }
-            ].map((benefit, index) => {
-              const BenefitIcon = benefit.icon;
-              return (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, y: 50 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, amount: 0.3 }}
-                  transition={{ duration: 0.6, delay: index * 0.15, ease: "easeOut" }}
-                  whileHover={{ y: -8, scale: 1.03, transition: { duration: 0.2 } }}
-                  className="bg-card/90 dark:bg-neutral-800/90 backdrop-blur-sm border border-border/30 dark:border-neutral-700/50 rounded-2xl overflow-hidden flex flex-col shadow-lg hover:shadow-xl transition-all duration-300 group"
-                  aria-labelledby={`benefit-title-${index}`}
-                >
-                  <div className={`absolute top-0 right-0 w-48 h-48 bg-gradient-to-bl ${benefit.color} rounded-full blur-3xl -z-10 opacity-70 group-hover:opacity-90 transition-opacity duration-300`} aria-hidden="true"></div>
-                  <div className="p-6 pb-8 flex-grow relative z-10 flex flex-col">
-                    <div
-                      className="mb-5 inline-flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br from-background to-muted/60 dark:from-neutral-700 dark:to-neutral-800/50 shadow-md border border-border/20 dark:border-neutral-600/50"
-                      aria-hidden="true" // Decorative icon, label provided by ariaLabel on parent or title
-                    >
-                      <BenefitIcon className="h-7 w-7 text-rashmi-red" />
-                    </div>
-                    <h3 id={`benefit-title-${index}`} className="text-xl font-semibold mb-2.5 text-foreground dark:text-neutral-100">{benefit.title}</h3>
-                    <p className="text-muted-foreground dark:text-neutral-300 text-sm leading-relaxed flex-grow">{benefit.description}</p>
-                    <div className="mt-6 h-[1px] w-full bg-gradient-to-r from-rashmi-red/40 via-border/50 to-transparent" aria-hidden="true"></div>
+              {
+                title: "Expand Your Reach",
+                description: "Access new markets and large-scale projects through our extensive network and ongoing tenders for ductile iron pipes and infrastructure projects.",
+                icon: TrendingUp,
+                color: "from-blue-500/10 to-blue-600/5 dark:from-blue-800/20 dark:to-blue-900/10",
+                ariaLabel: "Expand market reach with Rashmi Metaliks"
+              },
+              {
+                title: "Streamlined Procurement",
+                description: "Experience efficient digital processes, clear communication, and a dedicated vendor portal with our world-class procurement team.",
+                icon: CheckCircle,
+                color: "from-rashmi-red/10 to-red-600/5 dark:from-rashmi-red/20 dark:to-red-900/10",
+                ariaLabel: "Streamlined procurement processes"
+              },
+              {
+                title: "Reliable & Timely Payments",
+                description: "Benefit from structured payment cycles and financial predictability with Rashmi Metaliks, fostering a stable partnership for long-term growth.",
+                icon: ShieldCheck,
+                color: "from-emerald-500/10 to-green-600/5 dark:from-emerald-800/20 dark:to-green-900/10",
+                ariaLabel: "Reliable payment structure for vendors"
+              },
+              {
+                title: "Long-Term Growth",
+                description: "Become a preferred partner and scale your business alongside our expanding operations and projects in the steel and iron industry.",
+                icon: Award,
+                color: "from-amber-500/10 to-yellow-600/5 dark:from-amber-800/20 dark:to-yellow-900/10",
+                ariaLabel: "Growth opportunities for vendors"
+              },
+              {
+                title: "Innovation Synergy",
+                description: "Collaborate on new steel and iron solutions, gain early access to requirements, and contribute to DI pipe and infrastructure advancements.",
+                icon: Upload,
+                color: "from-indigo-500/10 to-purple-600/5 dark:from-indigo-800/20 dark:to-purple-900/10",
+                ariaLabel: "Innovation and collaboration with vendors"
+              },
+              {
+                title: "Sustainable Partnership",
+                description: "Align with our commitment to responsible sourcing, ethical practices, and environmental stewardship in the metals manufacturing industry.",
+                icon: CheckCircle,
+                color: "from-teal-500/10 to-cyan-600/5 dark:from-teal-800/20 dark:to-cyan-900/10",
+                ariaLabel: "Sustainable business partnerships"
+              }
+            ].map((benefit, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 50 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.3 }}
+                transition={{ duration: 0.6, delay: index * 0.15, ease: "easeOut" }}
+                whileHover={{ y: -8, scale: 1.03, transition: { duration: 0.2 } }}
+                className="bg-card/90 dark:bg-neutral-800/90 backdrop-blur-sm border border-border/30 dark:border-neutral-700/50 rounded-2xl overflow-hidden flex flex-col shadow-lg hover:shadow-xl transition-all duration-300 group"
+                aria-labelledby={`benefit-title-${index}`}
+              >
+                 <div className={`absolute top-0 right-0 w-48 h-48 bg-gradient-to-bl ${benefit.color} rounded-full blur-3xl -z-10 opacity-70 group-hover:opacity-90 transition-opacity duration-300`} aria-hidden="true"></div>
+
+                <div className="p-6 pb-8 flex-grow relative z-10 flex flex-col">
+                   <div
+                    className="mb-5 inline-flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br from-background to-muted/60 dark:from-neutral-700 dark:to-neutral-800/50 shadow-md border border-border/20 dark:border-neutral-600/50"
+                    aria-hidden="true"
+                    role="img"
+                    aria-label={benefit.ariaLabel}
+                  >
+                    <benefit.icon className="h-7 w-7 text-rashmi-red" />
                   </div>
-                </motion.div>
-              );
-            })}
+                   <h3 id={`benefit-title-${index}`} className="text-xl font-semibold mb-2.5 text-foreground dark:text-neutral-100">{benefit.title}</h3>
+                  <p className="text-muted-foreground dark:text-neutral-300 text-sm leading-relaxed flex-grow">{benefit.description}</p>
+                   <div className="mt-6 h-[1px] w-full bg-gradient-to-r from-rashmi-red/40 via-border/50 to-transparent" aria-hidden="true"></div>
+                </div>
+              </motion.div>
+            ))}
           </div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+            className="max-w-3xl mx-auto mt-16 text-center"
+          >
+            <h3 className="text-xl font-semibold mb-4">Explore Related Pages</h3>
+            <div className="flex flex-wrap justify-center gap-4">
+              <Link
+                to="/di-pipes"
+                className="px-4 py-2 bg-muted/50 hover:bg-rashmi-red/10 border border-border rounded-full text-sm text-muted-foreground hover:text-rashmi-red transition-colors"
+              >
+                Ductile Iron Pipes
+              </Link>
+              <Link
+                to="/about-us"
+                className="px-4 py-2 bg-muted/50 hover:bg-rashmi-red/10 border border-border rounded-full text-sm text-muted-foreground hover:text-rashmi-red transition-colors"
+              >
+                About Rashmi
+              </Link>
+              <Link
+                to="/contact-us"
+                className="px-4 py-2 bg-muted/50 hover:bg-rashmi-red/10 border border-border rounded-full text-sm text-muted-foreground hover:text-rashmi-red transition-colors"
+              >
+                Contact Us
+              </Link>
+              <Link
+                to="/quality-assurance"
+                className="px-4 py-2 bg-muted/50 hover:bg-rashmi-red/10 border border-border rounded-full text-sm text-muted-foreground hover:text-rashmi-red transition-colors"
+              >
+                Quality Assurance
+              </Link>
+            </div>
+          </motion.div>
 
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -1731,7 +1844,11 @@ const VendorRegistration: React.FC = () => {
           </motion.div>
         </div>
       </section>
+      */}
 
+      {/* =========================
+          Additional CSS Styles
+      ========================= */}
       <style>{`
         /* Font imports (ensure these are loaded, e.g., in public/index.html or via a global CSS file) */
         /* @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400..700&family=Lexend:wght@100..900&display=swap'); */
