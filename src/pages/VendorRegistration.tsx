@@ -1277,51 +1277,39 @@ const VendorRegistration: React.FC = () => {
                         <div className="space-y-6">
                           <SectionHeader icon={Phone} title="Contact Details" description="How we can reach you" />
                           <div className="grid md:grid-cols-2 gap-x-6 gap-y-5">
-                            <FormField label="Contact Number" required id="contactNo" error={errors.contactNo?.message}>
-                              <div className="relative">
+                            <FormField label={`Contact Number (with country code)`} required id="contactNo" error={errors.contactNo?.message}>
+                              <div className="flex items-center gap-2">
                                 {shouldShowCountryCodeBadge && (
-                                  <div className="absolute left-3 top-1/2 -translate-y-1/2 bg-muted/80 text-muted-foreground rounded px-1.5 py-0.5 text-xs font-medium select-none">
-                                    {activeDialCode}
-                                  </div>
+                                  <span className="px-2 py-1 rounded bg-muted/50 text-muted-foreground font-mono text-sm border border-border">{activeDialCode}</span>
                                 )}
                                 <Input
                                   id="contactNo"
                                   type="tel"
                                   placeholder={contactPlaceholder}
-                                  className={cn(
-                                    "bg-background/70",
-                                    shouldShowCountryCodeBadge && "pl-[calc(0.75rem+3.5rem)]" // Adjust padding based on badge size
-                                  )}
+                                  className="bg-background/70 dark:bg-neutral-800/50 focus:ring-offset-0 focus:ring-rashmi-red/50 focus:border-rashmi-red/80 flex-1"
                                   {...register("contactNo", {
                                     required: "Contact number is required",
-                                    onChange: handlePhoneChange, // Use the memoized handler
-                                    validate: (value) => {
-                                        // Re-calculate activeDialCode for validation context as it might not be updated yet if this runs before useEffect
-                                        const currentType = watch('vendorType');
-                                        const currentCountryVal = watch('country');
-                                        let validatingDialCode = '';
-                                        if (currentType === 'domestic') {
-                                            validatingDialCode = '+91';
-                                        } else if (currentCountryVal === 'others') {
-                                            validatingDialCode = customCountryCode;
-                                        } else {
-                                            const countryData = countries.find(c => c.code === currentCountryVal);
-                                            validatingDialCode = countryData?.countryCode || '';
+                                    validate: value => {
+                                      if (watch('vendorType') === 'domestic') {
+                                        if (!value.startsWith('+91 ')) {
+                                          return 'Number must start with +91 for domestic vendors';
                                         }
-                                        return validatePhoneNumber(value, validatingDialCode) ||
-                                        `Invalid phone number for ${countries.find(c=>c.countryCode === validatingDialCode)?.name || 'selected region'}.`;
+                                        const numberPart = value.replace('+91 ', '');
+                                        if (!/^\d{10}$/.test(numberPart)) {
+                                          return 'Please enter a valid 10-digit number after +91';
+                                        }
+                                      } else {
+                                        if (!/^[+\d\s]+$/.test(value)) {
+                                          return 'Please enter only numbers, spaces, and + sign';
+                                        }
+                                      }
+                                      return true;
                                     }
                                   })}
                                   aria-invalid={errors.contactNo ? "true" : "false"}
+                                  style={{ minWidth: 0 }}
                                 />
                               </div>
-                              {!errors.contactNo && (
-                                <p className="text-xs text-muted-foreground mt-1">
-                                  {isDomestic
-                                    ? 'Enter a 10-digit mobile number.'
-                                    : 'Include country code if not already shown.'}
-                                </p>
-                              )}
                             </FormField>
                             <FormField label="Email Address" required id="email" error={errors.email?.message}>
                               <Input
