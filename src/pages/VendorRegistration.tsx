@@ -5,8 +5,10 @@ import {
   Upload, Check, FileText, Building, User, Phone, Mail, Briefcase, CheckCircle, Globe, X, AlertCircle, Loader2, ChevronRight, ArrowRight, TrendingUp, ShieldCheck, Award, Plus
 } from 'lucide-react';
 import { useForm, SubmitHandler, Controller } from 'react-hook-form';
+// import axios from 'axios'; // Assuming 'api' handles axios instance
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+// import RevealText from '@/components/ui/RevealText'; // Not used in the provided snippet
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -16,7 +18,9 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Switch } from '@/components/ui/switch';
-import { cn } from '@/lib/utils';
+import { cn, /*formatFileSize, generateReferenceId*/ } from '@/lib/utils'; // formatFileSize, generateReferenceId not used here
+// import { generateFAQSchema, generateBreadcrumbSchema, generateOrganizationSchema } from '@/lib/schema'; // Not used
+// import { OptimizedImage } from '@/lib/imageOptimizer'; // Not used
 import api from '../config/api';
 
 // --- Constants and Types ---
@@ -28,14 +32,14 @@ interface VendorFormData {
   vendorType: string; // domestic or global
   country: string;
   website?: string;
-  contactNo: string; // Will store the full international number, e.g., +91xxxxxxxxxx or +1xxxxxxxxxx
+  contactNo: string;
   email: string;
   category: string;
   productDescription: string;
   majorClients?: string;
   turnover: string;
   turnoverCurrency: string; // 'INR' or 'USD'
-  gstNumber?: string;
+  gstNumber?: string; // GST Registration Number (optional)
   terms: boolean;
 }
 
@@ -48,7 +52,6 @@ const firmTypes = [
 ];
 
 const categories = [
-  // ... (categories remain the same)
   { id: 'stationary-computer', label: 'Stationary, Computer & Computer Accessories' },
   { id: 'cloth-textiles', label: 'Cloth, Textiles' },
   { id: 'rubber-pvc-belts', label: 'Rubber, PVC, Conveyor Belts, V Belts, Tyre' },
@@ -82,8 +85,8 @@ const categories = [
   { id: 'logistics', label: 'Logistics (sea, CHAs)' }
 ];
 
-// Base list of countries (deduplication will be applied)
-const baseCountriesList = [
+// Countries data for the dropdown
+const sortableCountries = [
   { code: "in", name: "India", countryCode: "+91" },
   { code: "ae", name: "United Arab Emirates", countryCode: "+971" },
   { code: "au", name: "Australia", countryCode: "+61" },
@@ -93,19 +96,19 @@ const baseCountriesList = [
   { code: "ca", name: "Canada", countryCode: "+1" },
   { code: "cn", name: "China", countryCode: "+86" },
   { code: "co", name: "Colombia", countryCode: "+57" },
-  // { code: "cz", name: "Czech Republic", countryCode: "+420" }, // Duplicate, will be handled
+  { code: "cz", name: "Czech Republic", countryCode: "+420" },
   { code: "de", name: "Germany", countryCode: "+49" },
-  // { code: "dk", name: "Denmark", countryCode: "+45" }, // Duplicate
+  { code: "dk", name: "Denmark", countryCode: "+45" },
   { code: "eg", name: "Egypt", countryCode: "+20" },
   { code: "es", name: "Spain", countryCode: "+34" },
-  // { code: "fi", name: "Finland", countryCode: "+358" }, // Duplicate
+  { code: "fi", name: "Finland", countryCode: "+358" },
   { code: "fr", name: "France", countryCode: "+33" },
   { code: "gb", name: "United Kingdom", countryCode: "+44" },
   { code: "gr", name: "Greece", countryCode: "+30" },
   { code: "hu", name: "Hungary", countryCode: "+36" },
   { code: "id", name: "Indonesia", countryCode: "+62" },
-  // { code: "ie", name: "Ireland", countryCode: "+353" }, // Duplicate
-  // { code: "il", name: "Israel", countryCode: "+972" }, // Duplicate
+  { code: "ie", name: "Ireland", countryCode: "+353" },
+  { code: "il", name: "Israel", countryCode: "+972" },
   { code: "it", name: "Italy", countryCode: "+39" },
   { code: "jp", name: "Japan", countryCode: "+81" },
   { code: "kr", name: "South Korea", countryCode: "+82" },
@@ -114,7 +117,7 @@ const baseCountriesList = [
   { code: "my", name: "Malaysia", countryCode: "+60" },
   { code: "ng", name: "Nigeria", countryCode: "+234" },
   { code: "nl", name: "Netherlands", countryCode: "+31" },
-  // { code: "no", name: "Norway", countryCode: "+47" }, // Duplicate
+  { code: "no", name: "Norway", countryCode: "+47" },
   { code: "np", name: "Nepal", countryCode: "+977" },
   { code: "nz", name: "New Zealand", countryCode: "+64" },
   { code: "ph", name: "Philippines", countryCode: "+63" },
@@ -168,110 +171,85 @@ const baseCountriesList = [
   { code: "li", name: "Liechtenstein", countryCode: "+423" },
   { code: "sm", name: "San Marino", countryCode: "+378" },
   { code: "mc", name: "Monaco", countryCode: "+377" },
-  { code: "va", name: "Vatican City", countryCode: "+39" }, // Note: Same code as Italy
+  { code: "va", name: "Vatican City", countryCode: "+39" },
 ];
 
-const uniqueCountriesMap = new Map<string, { code: string; name: string; countryCode: string }>();
-baseCountriesList.forEach(country => {
-    if (!uniqueCountriesMap.has(country.code)) {
-        uniqueCountriesMap.set(country.code, country);
-    } else {
-        // Handle Vatican City manually if it has same code as Italy but different name
-        if (country.code === 'va' && country.name === 'Vatican City') {
-             uniqueCountriesMap.set(country.code, country); // Prefer Vatican if 'va' means Vatican specifically
-        }
-    }
-});
-// Ensure Italy is present if Vatican overwrote it due to same country code
-if (!Array.from(uniqueCountriesMap.values()).find(c => c.code === 'it' && c.name === 'Italy')) {
-    const italyData = baseCountriesList.find(c => c.code === 'it' && c.name === 'Italy');
-    if (italyData) uniqueCountriesMap.set('it', italyData);
-}
-
-
-const dedupedCountriesArray = Array.from(uniqueCountriesMap.values());
-const sortableCountries = dedupedCountriesArray.sort((a, b) => a.name.localeCompare(b.name));
-
+// Add "Others" at the end, after sorting
 const countries = [
   ...sortableCountries,
   { code: "others", name: "Others", countryCode: "" },
 ];
 
-
+// Allowed file types and size limits
 const ALLOWED_FILE_TYPES = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
 const MAX_FILE_SIZE_MB = 10;
 const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024;
 
+// Improved phone number formatting helper function
 const formatPhoneNumber = (phoneNumber: string, countryCode: string): string => {
-    let input = phoneNumber.trim();
-    let prefixToUse = countryCode ? countryCode.trim() : "";
+  let cleaned = phoneNumber.replace(/[^\d+]/g, ''); // Strip non-digits, keep leading +
 
-    // Remove existing prefix from input if it matches prefixToUse, to avoid duplication like +1+1...
-    if (prefixToUse && input.startsWith(prefixToUse)) {
-        input = input.substring(prefixToUse.length).trim();
-    } else if (input.startsWith('+') && prefixToUse && input.startsWith(prefixToUse.substring(1))) {
-        // Handles case where input is like "1 123" and prefixToUse is "+1"
-        // This case might be complex and depends on how aggressively initial plus is stripped.
-        // Let's assume input is mostly national part or full number.
+  // If countryCode is provided and cleaned number doesn't start with a '+', prepend countryCode
+  if (countryCode && !cleaned.startsWith('+')) {
+    cleaned = countryCode + cleaned.replace(/\D/g, ""); // Ensure only digits from phoneNumber are appended
+  } else if (!countryCode && !cleaned.startsWith('+')) {
+    // If no countryCode and no '+', just add '+' to what's left (should be mostly digits)
+    cleaned = '+' + cleaned.replace(/\D/g, "");
+  } else if (cleaned.startsWith('+')) {
+    // If it already starts with a '+', assume prefix is there or part of it.
+    // Clean the part after the first '+' to ensure it's digits.
+    const parts = cleaned.split('+');
+    if (parts.length > 1) {
+        cleaned = '+' + parts.slice(1).join('').replace(/\D/g, "");
+    } else {
+        cleaned = '+' + cleaned.replace(/\D/g, ""); // Fallback if split is weird
     }
+  }
 
 
-    // Get only digits from the (potentially national) input part
-    let nationalDigits = input.replace(/\D/g, '');
+  // Basic spacing for readability (can be enhanced for specific country patterns)
+  // This is a generic international-like spacing after the prefix
+  if (cleaned.startsWith('+')) {
+    const prefixMatch = cleaned.match(/^(\+\d{1,4})/); // Match + and 1 to 4 digits for prefix
+    if (prefixMatch) {
+      const prefix = prefixMatch[0];
+      const numberPart = cleaned.substring(prefix.length).replace(/\D/g, ''); // Get remaining digits
 
-    if (!prefixToUse && input.startsWith('+')) { // User is typing an international number manually
-        const potentialPrefix = input.match(/^(\+\d{1,4})/);
-        if (potentialPrefix) {
-            prefixToUse = potentialPrefix[0];
-            nationalDigits = input.substring(prefixToUse.length).replace(/\D/g, '');
-        } else { // Just a plus, or invalid
-            return '+' + nationalDigits; // Or just nationalDigits if no clear prefix
+      let spacedNumber = prefix;
+      if (numberPart.length > 0) {
+        spacedNumber += ' ' + numberPart;
+        // Example: +91 12345 67890 (India)
+        if (prefix === '+91' && numberPart.length === 10) {
+            spacedNumber = `${prefix} ${numberPart.substring(0, 5)} ${numberPart.substring(5)}`;
         }
-    } else if (!prefixToUse && nationalDigits.length > 0) { // No country code given, but has digits, assume it's local or needs prefix
-        return nationalDigits; // Or prepend a default "+" if it's meant to be international
+        // Add more country-specific formatting if needed
+      }
+      return spacedNumber.trim();
     }
+  }
 
-
-    if (!prefixToUse) return nationalDigits; // Cannot format without a country code
-
-    let formatted = prefixToUse;
-    if (nationalDigits.length > 0) {
-        formatted += " " + nationalDigits; // Basic spacing
-
-        // India specific formatting
-        if (prefixToUse === '+91' && nationalDigits.length === 10) {
-            formatted = `${prefixToUse} ${nationalDigits.substring(0, 5)} ${nationalDigits.substring(5)}`;
-        }
-        // Add more country-specific formatting rules here if needed
-        // e.g. USA: +1 XXX XXX XXXX
-        else if (prefixToUse === '+1' && nationalDigits.length === 10) {
-             formatted = `${prefixToUse} ${nationalDigits.substring(0,3)} ${nationalDigits.substring(3,6)} ${nationalDigits.substring(6)}`;
-        }
-    }
-    return formatted.trim();
+  // Fallback if no clear prefix logic was hit, just return cleaned or an empty string if it's just "+"
+  return cleaned === '+' ? '' : cleaned;
 };
 
-const validatePhoneNumber = (fullPhoneNumber: string, countryCode: string): boolean => {
-  if (!countryCode) { // If no country code context, try a generic validation
-    const digits = fullPhoneNumber.replace(/\D/g, '');
-    return digits.length >= 7 && digits.length <= 15; // Common international range
-  }
 
-  let nationalNumberPart = fullPhoneNumber;
-  // Strip the country code from the beginning of the full number to get the national part
-  if (fullPhoneNumber.startsWith(countryCode)) {
-    nationalNumberPart = fullPhoneNumber.substring(countryCode.length);
+// Validate phone number based on country
+const validatePhoneNumber = (phone: string, countryCode: string): boolean => {
+  // Remove country code from phone string for validation if it's there and matches
+  let nationalNumber = phone;
+  if (countryCode && phone.startsWith(countryCode)) {
+      nationalNumber = phone.substring(countryCode.length);
   }
-  
-  const nationalDigits = nationalNumberPart.replace(/\D/g, '');
+  const digits = nationalNumber.replace(/\D/g, ''); // Get only digits of the national part
 
-  if (countryCode === '+91') {
-    return nationalDigits.length === 10;
+  if (countryCode === '+91') { // India
+    return digits.length === 10;
   }
   // Generic validation for other countries (minimum 7 digits for national part)
-  return nationalDigits.length >= 7 && nationalDigits.length <= 14; // Adjust max as needed
+  return digits.length >= 7;
 };
-// ... (Helper Components FormField, SectionHeader remain the same)
+
+// --- Helper Components ---
 interface FormFieldProps {
   id: keyof VendorFormData | string;
   label: string;
@@ -312,7 +290,7 @@ const SectionHeader: React.FC<SectionHeaderProps> = ({ icon: Icon, title, descri
   </div>
 );
 
-// ... (Animation Variants remain the same)
+// --- Animation Variants ---
 const fadeInUp: Variants = {
   hidden: { opacity: 0, y: 20 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } }
@@ -339,22 +317,24 @@ const shimmerVariants: Variants = {
   }
 };
 
-
+// --- Main Component ---
 const VendorRegistration: React.FC = () => {
+  // State variables
   const [files, setFiles] = useState<File[]>([]);
   const [fileNames, setFileNames] = useState<string[]>([]);
   const [fileErrors, setFileErrors] = useState<string[]>([]);
   const [filePreviews, setFilePreviews] = useState<string[]>([]);
+  // const [fileTypes, setFileTypes] = useState<string[]>([]); // fileTypes not directly used after setting
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [customCountry, setCustomCountry] = useState('');
-  const [customCountryCode, setCustomCountryCode] = useState('');
-  const [countrySearchTerm, setCountrySearchTerm] = useState('');
+  const [customCountryCode, setCustomCountryCode] = useState(''); // Should store with '+' e.g. "+123"
+  const [countrySearchQuery, setCountrySearchQuery] = useState('');
 
-
+  // Form setup
   const { register, handleSubmit, control, formState: { errors, isSubmitting }, reset, watch, setValue, trigger } = useForm<VendorFormData>({
-    mode: 'onBlur',
+    mode: 'onBlur', // Or 'onChange' for more immediate feedback
     defaultValues: {
       name: '',
       designation: '',
@@ -363,7 +343,7 @@ const VendorRegistration: React.FC = () => {
       vendorType: 'domestic',
       country: 'in',
       website: '',
-      contactNo: '+91 ', // Default for India
+      contactNo: '+91 ',
       email: '',
       category: '',
       productDescription: '',
@@ -378,20 +358,23 @@ const VendorRegistration: React.FC = () => {
   const heroControls = useAnimation();
   const formControls = useAnimation();
 
+  // Animations on mount
   useEffect(() => {
     heroControls.start("visible");
     formControls.start("visible");
   }, [heroControls, formControls]);
 
+
   const watchedVendorType = watch('vendorType');
   const watchedCountry = watch('country');
-  const contactNoRHF = watch('contactNo'); // Full international number stored here
 
-  // File handling (remains largely the same, ensure callbacks have all deps)
+
+  // File handling functions
   const clearAllFiles = useCallback(() => {
     setFiles([]);
     setFileNames([]);
     setFilePreviews([]);
+    // setFileTypes([]);
     setFileErrors([]);
     const fileInput = document.getElementById('file-upload') as HTMLInputElement;
     if (fileInput) fileInput.value = '';
@@ -399,15 +382,21 @@ const VendorRegistration: React.FC = () => {
 
   const clearFile = useCallback((index?: number, e?: React.MouseEvent) => {
     e?.stopPropagation();
+
     if (index !== undefined) {
       if (filePreviews[index] && filePreviews[index].startsWith('blob:')) {
         URL.revokeObjectURL(filePreviews[index]);
       }
-      const removedFileName = fileNames[index];
       setFiles(prev => prev.filter((_, i) => i !== index));
       setFileNames(prev => prev.filter((_, i) => i !== index));
       setFilePreviews(prev => prev.filter((_, i) => i !== index));
-      setFileErrors(prev => prev.filter(err => !err.includes(`"${removedFileName}"`)));
+      // setFileTypes(prev => prev.filter((_, i) => i !== index));
+      setFileErrors(prev => {
+        const newErrors = [...prev];
+        // This is a simplistic error removal, assuming errors map to file indices or are general
+        // A more robust system would associate errors with specific files or have a general error list
+        return newErrors.filter((_, i) => i !== index && !newErrors[i].includes(fileNames[index])); // Attempt to remove error related to cleared file
+      });
     } else {
       filePreviews.forEach(preview => {
         if (preview && preview.startsWith('blob:')) {
@@ -416,119 +405,158 @@ const VendorRegistration: React.FC = () => {
       });
       clearAllFiles();
     }
-  }, [filePreviews, fileNames, clearAllFiles]);
+  }, [filePreviews, clearAllFiles, fileNames]);
+
 
   const handleFileValidation = (selectedFile: File): boolean => {
-    if (!ALLOWED_FILE_TYPES.includes(selectedFile.type)) return false;
-    if (selectedFile.size > MAX_FILE_SIZE_BYTES) return false;
+    if (!ALLOWED_FILE_TYPES.includes(selectedFile.type)) {
+      return false;
+    }
+    if (selectedFile.size > MAX_FILE_SIZE_BYTES) {
+      return false;
+    }
     return true;
   };
 
-   const processFiles = useCallback((selectedFiles: FileList) => {
-    const currentFilesCount = files.length;
-    const filesToAdd: File[] = [];
-    const namesToAdd: string[] = [];
-    const previewsToAdd: string[] = [];
-    const errorsToAdd: string[] = [];
+  const processFiles = useCallback((selectedFiles: FileList) => {
+    if (files.length + selectedFiles.length > 3) {
+      setFileErrors(prev => [...prev.filter(err => !err.startsWith("Maximum 3 files allowed.")), `Maximum 3 files allowed. You can select ${3 - files.length} more.`]);
+      return;
+    }
 
-    Array.from(selectedFiles).every(file => { // Use .every to allow early exit
-        if (currentFilesCount + filesToAdd.length >= 3) {
-            if (!errorsToAdd.some(e => e.startsWith("Maximum 3 files allowed."))) {
-                 errorsToAdd.push(`Maximum 3 files allowed. Only ${3-currentFilesCount} more can be added.`);
-            }
-            return false; // Stop processing more files
+    const newFiles: File[] = [];
+    const newFileNames: string[] = [];
+    const newFilePreviews: string[] = [];
+    // const newFileTypes: string[] = [];
+    const currentFileErrors: string[] = [];
+
+    Array.from(selectedFiles).forEach(file => {
+      if (newFiles.length + files.length >= 3) { // Check limit again inside loop
+        if(!currentFileErrors.some(e => e.startsWith("Maximum 3 files"))) { // Avoid duplicate max files error
+             currentFileErrors.push(`Maximum 3 files allowed. Only added ${newFiles.length} of ${selectedFiles.length}.`);
         }
+        return; // Stop processing more files if limit reached
+      }
 
-        if (!handleFileValidation(file)) {
-            const errorMessage = file.size > MAX_FILE_SIZE_BYTES
-                ? `File "${file.name}" is too large (Max ${MAX_FILE_SIZE_MB}MB).`
-                : `File "${file.name}" has an invalid format. Only PDF/Word allowed.`;
-            errorsToAdd.push(errorMessage);
-            return true; // Continue to next file
-        }
+      if (!handleFileValidation(file)) {
+        const errorMessage = file.size > MAX_FILE_SIZE_BYTES
+          ? `File "${file.name}" is too large (Max ${MAX_FILE_SIZE_MB}MB).`
+          : `File "${file.name}" has an invalid format. Only PDF and Word documents (DOC/DOCX) are allowed.`;
+        currentFileErrors.push(errorMessage);
+        return;
+      }
 
-        filesToAdd.push(file);
-        namesToAdd.push(file.name);
+      newFiles.push(file);
+      newFileNames.push(file.name);
+      // newFileTypes.push(file.type);
 
-        if (file.type.startsWith('image/')) { // Unlikely with current ALLOWED_FILE_TYPES
-            const reader = new FileReader();
-            reader.onloadend = () => { // This is async, direct push might be an issue for order
-                setFilePreviews(prev => {
-                    const newPreviews = [...prev];
-                    const targetIndex = prev.length - filesToAdd.length + namesToAdd.indexOf(file.name); // Approximate index
-                    if (targetIndex >= 0 && targetIndex < newPreviews.length) newPreviews[targetIndex] = reader.result as string;
-                    return newPreviews;
-                });
-            };
-            reader.readAsDataURL(file);
-            previewsToAdd.push(''); // Placeholder
-        } else if (file.type === 'application/pdf') {
-            previewsToAdd.push(URL.createObjectURL(file));
-        } else {
-            previewsToAdd.push('');
-        }
-        return true;
+      if (file.type.startsWith('image/')) { // Though ALLOWED_FILE_TYPES doesn't include images by default
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setFilePreviews(prev => [...prev, reader.result as string]);
+        };
+        reader.readAsDataURL(file);
+        newFilePreviews.push(''); // Placeholder, will be updated by reader
+      } else if (file.type === 'application/pdf') {
+        const objectUrl = URL.createObjectURL(file);
+        newFilePreviews.push(objectUrl);
+      } else {
+        newFilePreviews.push(''); // For Word docs or others
+      }
     });
 
-    if (filesToAdd.length > 0) {
-        setFiles(prev => [...prev, ...filesToAdd]);
-        setFileNames(prev => [...prev, ...namesToAdd]);
-        setFilePreviews(prev => [...prev, ...previewsToAdd]);
+    if (newFiles.length > 0) {
+        setFiles(prev => [...prev, ...newFiles]);
+        setFileNames(prev => [...prev, ...newFileNames]);
+        setFilePreviews(prev => [...prev, ...newFilePreviews]); // Previews are pushed directly or via async reader
+        // setFileTypes(prev => [...prev, ...newFileTypes]);
     }
-    if (errorsToAdd.length > 0) {
-        setFileErrors(prev => [...prev.filter(e => !e.startsWith("Maximum 3 files allowed.")), ...errorsToAdd]);
+    if (currentFileErrors.length > 0) {
+        setFileErrors(prev => [...prev, ...currentFileErrors]);
     }
-}, [files.length]); // Dependency on files.length is key here
+
+  }, [files.length]);
 
 
   const handleFileChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) processFiles(e.target.files);
-    e.target.value = '';
+    if (e.target.files && e.target.files.length > 0) {
+      processFiles(e.target.files);
+      // Clear the input value to allow selecting the same file again if removed
+      e.target.value = '';
+    }
   }, [processFiles]);
 
-  const handleDragOver = useCallback((e: DragEvent<HTMLDivElement>) => { e.preventDefault(); e.stopPropagation(); setIsDragging(true); }, []);
-  const handleDragLeave = useCallback((e: DragEvent<HTMLDivElement>) => { e.preventDefault(); e.stopPropagation(); setIsDragging(false); }, []);
+  const handleDragOver = useCallback((e: DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(true);
+  }, []);
+
+  const handleDragLeave = useCallback((e: DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+  }, []);
+
   const handleFileDrop = useCallback((e: DragEvent<HTMLDivElement>) => {
-    e.preventDefault(); e.stopPropagation(); setIsDragging(false);
-    if (e.dataTransfer.files) processFiles(e.dataTransfer.files);
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      processFiles(e.dataTransfer.files);
+    }
   }, [processFiles]);
 
+
+  // Form submission handler
   const onSubmit: SubmitHandler<VendorFormData> = async (data) => {
-    // ... (onSubmit logic remains largely the same, ensure data.contactNo is the full international number)
-     try {
-      setUploadProgress(10);
+    try {
+      setUploadProgress(10); // Initial progress
 
       const formData = new FormData();
-      // Ensure contactNo is the full international number before appending
-      const fullContactNo = data.contactNo; // Already should be full from setValue
-      
-      Object.entries({...data, contactNo: fullContactNo}).forEach(([key, value]) => {
+      Object.entries(data).forEach(([key, value]) => {
           if (typeof value === 'boolean') {
             formData.append(key, String(value));
           } else if (value !== undefined && value !== null && value !== '') {
-            formData.append(key, String(value)); // Ensure string for all non-file values
+            formData.append(key, value);
           }
       });
 
       if (data.country === 'others' && customCountry) {
-        formData.append('customCountryName', customCountry);
+        formData.append('customCountryName', customCountry); // Use a distinct name
       }
+      // customCountryCode is part of contactNo logic, might not need separate submission if contactNo is correctly formatted
+      // However, if backend needs it explicitly for 'others':
       if (data.country === 'others' && customCountryCode) {
         formData.append('customCountryDialCode', customCountryCode);
       }
 
-      files.forEach((file) => formData.append('supportingDocuments', file));
+
+      files.forEach((file) => {
+        formData.append('supportingDocuments', file); // Consistent field name
+      });
+
       setUploadProgress(20);
 
+      // Debug log (optional)
+      // console.log('Form Data Contents:');
+      // for (let [key, value] of formData.entries()) {
+      //   console.log(`${key}: ${value instanceof File ? `File: ${value.name} (${value.size} bytes)` : value}`);
+      // }
+
       const response = await api.post('/vendors', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
         onUploadProgress: (progressEvent) => {
-          const total = progressEvent.total || files.reduce((acc, f) => acc + f.size, 0) || 1;
-          const percentCompleted = Math.round((progressEvent.loaded * 100) / total);
-          setUploadProgress(20 + (percentCompleted * 0.6));
+          const total = progressEvent.total || files.reduce((acc, f) => acc + f.size, 0); // Estimate total if not available
+          if (total) {
+            const percentCompleted = Math.round((progressEvent.loaded * 100) / total);
+            setUploadProgress(20 + (percentCompleted * 0.6)); // Scale to 20-80%
+          }
         }
       });
-      
+
       setUploadProgress(80);
       const responseData = response.data;
 
@@ -538,29 +566,41 @@ const VendorRegistration: React.FC = () => {
           window.scrollTo({ top: 0, behavior: 'smooth' });
           setTimeout(() => {
             setIsSubmitted(true);
-            reset(); 
+            reset(); // Reset form fields to defaultValues
             clearAllFiles();
-            setCustomCountry(''); 
+            setCustomCountry(''); // Reset custom country state
             setCustomCountryCode('');
-            setValue('vendorType', 'domestic', { shouldValidate: true }); // Explicitly reset after form reset
+            setCountrySearchQuery(''); // Reset country search
+            // Explicitly reset vendorType and country to defaults if needed after reset()
+            setValue('vendorType', 'domestic', { shouldValidate: true });
             setValue('country', 'in', { shouldValidate: true });
-            // setValue('contactNo', '+91 ', { shouldValidate: true }); // useEffect will handle this
+            setValue('contactNo', '+91 ', { shouldValidate: true });
             resolve();
           }, 500);
         });
       } else {
-        throw new Error(responseData.message || 'Failed to submit');
+        throw new Error(responseData.message || 'Failed to submit vendor registration');
       }
     } catch (error) {
       console.error('Error submitting form:', error);
-      setFileErrors(prev => [...prev, error instanceof Error ? `Submission failed: ${error.message}` : 'Submission failed.']);
-      setUploadProgress(0);
+      setFileErrors(prev => [...prev,
+        error instanceof Error
+          ? `Submission failed: ${error.message}`
+          : 'Submission failed. Please check your connection and try again.'
+      ]);
+      setUploadProgress(0); // Reset progress on error
     } finally {
-        setTimeout(() => setUploadProgress(0), isSubmitted ? 2000 : 1000);
+      // Keep progress at 100 for a bit on success, then reset
+      if (isSubmitted) { // This check might be tricky due to async nature
+        setTimeout(() => setUploadProgress(0), 2000);
+      } else if (uploadProgress !== 100) { // if not success, reset sooner
+        setTimeout(() => setUploadProgress(0), 1000);
+      }
     }
   };
 
-  useEffect(() => { /* Parallax effect ... */ 
+  // Parallax effect
+  useEffect(() => {
     const parallaxElements = document.querySelectorAll('.parallax-bg');
     let ticking = false;
     let lastScrollY = window.scrollY;
@@ -580,31 +620,45 @@ const VendorRegistration: React.FC = () => {
       }
     };
     window.addEventListener('scroll', handleScroll, { passive: true });
-    handleScroll(); 
+    handleScroll(); // Initial call
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+
+  // Derived values for UI display (country code badge, placeholder)
   const isOtherCountrySelected = watchedCountry === 'others';
   const isDomestic = watchedVendorType === 'domestic';
-  
+
   const activeDialCode = useMemo(() => {
     if (isDomestic) return '+91';
-    if (isOtherCountrySelected) return customCountryCode || ""; // Ensure customCountryCode is like "+XXX"
+    if (isOtherCountrySelected) return customCountryCode; // customCountryCode includes '+'
     const countryData = countries.find(c => c.code === watchedCountry);
-    return countryData?.countryCode || "";
+    return countryData?.countryCode || '';
   }, [isDomestic, isOtherCountrySelected, watchedCountry, customCountryCode]);
-
-  const shouldShowCountryCodeBadge = !isDomestic && !!activeDialCode;
 
   const contactPlaceholder = useMemo(() => {
     if (isDomestic) return 'XXXXXXXXXX (10 digits)';
-    if (shouldShowCountryCodeBadge) return 'Your Number'; // Changed
-    if (activeDialCode) return `${activeDialCode} Your Number`; 
-    return 'Your Number (with +code)';
-  }, [isDomestic, activeDialCode, shouldShowCountryCodeBadge]);
+    if (activeDialCode) return 'Your Number'; // Removed country code from placeholder since it's shown in badge
+    return '+__ Your Number';
+  }, [isDomestic, activeDialCode]);
+
+  const shouldShowCountryCodeBadge = !isDomestic && !!activeDialCode;
+
+  // Filter countries based on search query
+  const filteredCountries = useMemo(() => {
+    if (!countrySearchQuery.trim()) {
+      return countries;
+    }
+    const query = countrySearchQuery.toLowerCase().trim();
+    return countries.filter(country =>
+      country.name.toLowerCase().includes(query) ||
+      country.countryCode.includes(query)
+    );
+  }, [countrySearchQuery]);
 
 
-  useEffect(() => { /* Cleanup object URLs ... */ 
+  // Cleanup object URLs on unmount
+  useEffect(() => {
     return () => {
       filePreviews.forEach(url => {
         if (url && url.startsWith('blob:')) {
@@ -614,39 +668,21 @@ const VendorRegistration: React.FC = () => {
     };
   }, [filePreviews]);
 
-  // This derived value is for the *visual display* in the input field
-  const contactNoDisplayValue = useMemo(() => {
-    if (shouldShowCountryCodeBadge && activeDialCode && contactNoRHF.startsWith(activeDialCode)) {
-        // Show only the national part, stripping the activeDialCode prefix
-        return contactNoRHF.substring(activeDialCode.length).trimStart();
-    }
-    return contactNoRHF; // Otherwise, show the full stored value
-  }, [contactNoRHF, shouldShowCountryCodeBadge, activeDialCode]);
-
-  // Custom handler for contact number input when badge is shown
-  const handleContactNoInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const nationalPartTyped = e.target.value;
-    let numberToStore;
-
-    if (shouldShowCountryCodeBadge && activeDialCode) {
-        // User is typing the national part, reconstruct full number with activeDialCode
-        numberToStore = activeDialCode + nationalPartTyped.replace(/\D/g, ''); // Only append digits
-    } else {
-        // User is typing the full number, possibly including their own prefix
-        numberToStore = nationalPartTyped;
-    }
-    // formatPhoneNumber will then try to make sense of it and format correctly
-    // It uses activeDialCode as a hint if numberToStore doesn't have a prefix.
-    setValue('contactNo', formatPhoneNumber(numberToStore, activeDialCode), { shouldValidate: true });
-  }, [activeDialCode, setValue, shouldShowCountryCodeBadge]);
+  // Handle phone number input change with formatting
+  const handlePhoneChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const inputValue = e.target.value;
+    const formattedPhone = formatPhoneNumber(inputValue, activeDialCode);
+    setValue('contactNo', formattedPhone, { shouldValidate: true });
+  }, [activeDialCode, setValue]);
 
 
+  // Effect to manage country field and contact number prefix based on context changes
   useEffect(() => {
     const currentVendorType = watchedVendorType;
     const currentCountry = watchedCountry;
-    
-    let newTargetCountryForField = currentCountry; 
-    let newTargetPhonePrefix = "";
+
+    let newTargetCountryForField = currentCountry; // what country field should be
+    let newTargetPhonePrefix = ""; // what phone prefix should be
 
     if (currentVendorType === 'domestic') {
         newTargetPhonePrefix = '+91';
@@ -654,63 +690,69 @@ const VendorRegistration: React.FC = () => {
             newTargetCountryForField = 'in';
         }
     } else { // Global
-        if (currentCountry === 'in') { 
+        if (currentCountry === 'in') { // If was domestic (India) and switched to global
             const usCountryData = countries.find(c => c.code === 'us');
             if (usCountryData) {
-                newTargetCountryForField = 'us'; 
+                newTargetCountryForField = 'us'; // Default to US
                 newTargetPhonePrefix = usCountryData.countryCode;
-            } else { 
-                newTargetCountryForField = ''; 
+            } else { // Fallback if US not found (should not happen with current data)
+                newTargetCountryForField = '';
                 newTargetPhonePrefix = '';
             }
         } else if (currentCountry === 'others') {
             newTargetCountryForField = 'others';
-            newTargetPhonePrefix = customCountryCode; 
+            newTargetPhonePrefix = customCountryCode; // This should have '+'
         } else if (currentCountry) {
             const countryData = countries.find(c => c.code === currentCountry);
             newTargetPhonePrefix = countryData?.countryCode || '';
         } else {
-             newTargetPhonePrefix = ''; 
+             newTargetPhonePrefix = ''; // No country selected for global
         }
     }
-    
+
+    // Update country form field if it needs to change
     if (watch('country') !== newTargetCountryForField && newTargetCountryForField) {
         setValue('country', newTargetCountryForField, { shouldValidate: true, shouldDirty: (watch('country') !== newTargetCountryForField) });
     }
 
-    const currentFullPhoneVal = watch('contactNo'); // Full number like +1123...
-    let nationalPartOfCurrentPhone = currentFullPhoneVal;
+    // Update contact number prefix
+    const currentPhoneVal = watch('contactNo');
+    const currentPhoneTrimmed = currentPhoneVal ? currentPhoneVal.trim() : "";
 
-    if (newTargetPhonePrefix && currentFullPhoneVal.startsWith(newTargetPhonePrefix)) {
-        nationalPartOfCurrentPhone = currentFullPhoneVal.substring(newTargetPhonePrefix.length).replace(/\D/g,'');
-    } else if (currentFullPhoneVal.startsWith('+')) { // Has some prefix, try to get national
-        nationalPartOfCurrentPhone = currentFullPhoneVal.replace(/^\+\d*\s*/, '').replace(/\D/g,'');
-    } else { // Assumed to be national or empty
-        nationalPartOfCurrentPhone = currentFullPhoneVal.replace(/\D/g,'');
+    if (newTargetPhonePrefix) { // If a target prefix is determined
+        const prefixWithSpace = newTargetPhonePrefix + ' ';
+        if (currentPhoneTrimmed === '' || currentPhoneTrimmed === newTargetPhonePrefix) {
+            // If phone is empty or exactly the prefix (no national number), set it
+            if (currentPhoneVal !== prefixWithSpace) { // Avoid redundant update
+                 setValue('contactNo', prefixWithSpace, { shouldValidate: true });
+            }
+        } else if (!currentPhoneVal.startsWith(newTargetPhonePrefix)) {
+            // Phone has content but not the right prefix. Preserve national number.
+            const nationalNumber = currentPhoneVal.replace(/^\+\d*\s*/, '').trim(); // Strip any old prefix-like part
+            if (nationalNumber === '') { // It was just an old prefix
+                 if (currentPhoneVal !== prefixWithSpace) { // Avoid redundant update
+                    setValue('contactNo', prefixWithSpace, { shouldValidate: true });
+                 }
+            } else {
+                setValue('contactNo', formatPhoneNumber(nationalNumber, newTargetPhonePrefix), { shouldValidate: true });
+            }
+        }
+        // If currentPhoneVal already starts with newTargetPhonePrefix, user is likely typing the national part.
+        // handlePhoneChange will take care of formatting it.
+    } else if (currentVendorType === 'global' && currentPhoneTrimmed === '') {
+        // Global, no specific prefix yet (e.g. "select country" or "others" with no custom code)
+        // and phone is empty.
+        setValue('contactNo', '+ ', { shouldValidate: true }); // Default to "+ " to indicate intl. prefix needed
     }
-    
-    const newlyFormattedPhone = formatPhoneNumber(nationalPartOfCurrentPhone, newTargetPhonePrefix);
 
-    if (currentFullPhoneVal !== newlyFormattedPhone) {
-         setValue('contactNo', newlyFormattedPhone, { shouldValidate: true });
-    }
-    
   }, [watchedVendorType, watchedCountry, customCountryCode, setValue, watch]);
-
-  const filteredCountries = useMemo(() => {
-    if (!countrySearchTerm) return countries;
-    const lowerSearchTerm = countrySearchTerm.toLowerCase();
-    return countries.filter(country =>
-        country.name.toLowerCase().includes(lowerSearchTerm) ||
-        country.countryCode.includes(lowerSearchTerm) // Search by dial code too
-    );
-  }, [countrySearchTerm]);
 
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-gray-50 to-blue-50/30 dark:from-neutral-950 dark:via-neutral-900 dark:to-blue-950/30">
       <Header />
-      {/* ... Hero Section ... */}
+
+      {/* Hero Section */}
       <motion.section
         className="pt-48 pb-32 relative isolate overflow-hidden"
         initial="hidden"
@@ -828,24 +870,52 @@ const VendorRegistration: React.FC = () => {
         </div>
       </motion.section>
 
+      {/* Registration Form Section */}
+      <motion.section
+        id="registration-form"
+        className="py-24 relative isolate"
+        initial="hidden"
+        animate={formControls}
+        variants={fadeInUp}
+        style={{
+          willChange: 'transform',
+          transform: 'translateZ(0)',
+          backfaceVisibility: 'hidden',
+        }}
+        aria-labelledby="form-heading"
+      >
+        {/* Background Elements */}
+        <div className="absolute inset-0 z-[-1] pointer-events-none">
+          <div className="absolute -left-[20%] top-[15%] w-[40%] h-[50%] rounded-full bg-gradient-to-br from-blue-500/10 via-blue-500/5 to-transparent blur-3xl opacity-60 parallax-bg" data-speed="0.2"></div>
+          <div className="absolute -right-[10%] bottom-[5%] w-[35%] h-[40%] rounded-full bg-gradient-to-tl from-rashmi-red/10 via-rashmi-red/5 to-transparent blur-3xl opacity-50 parallax-bg" data-speed="-0.1"></div>
+        </div>
 
-      <motion.section id="registration-form" className="py-24 relative isolate" /* ... */ >
-        {/* ... */}
         <div className="container mx-auto px-4 relative">
           <AnimatePresence mode="wait" initial={false}>
             {isSubmitted ? (
-              <motion.div key="success" /* ... Success state JSX ... */ >
-                 {/* Enhanced Success State (contents as before) */}
+              // --- Enhanced Success State ---
+              <motion.div
+                key="success"
+                initial={{ opacity: 0, y: 30, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: -30, scale: 0.95 }}
+                transition={{ duration: 0.6, ease: "easeOut" }}
+                className="max-w-2xl mx-auto text-center p-10 md:p-16 bg-gradient-to-br from-green-50 via-white to-green-50 dark:from-green-950/30 dark:via-neutral-900 dark:to-green-950/30 rounded-3xl border border-green-300/50 dark:border-green-700/30 shadow-2xl shadow-green-200/30 dark:shadow-green-900/30 relative overflow-hidden"
+              >
+                  {/* Subtle Background Pattern */}
                 <div className="absolute inset-0 opacity-[0.03] pointer-events-none">
+                    {/* Example: Dashed lines pattern */}
                     <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
                         <defs>
-                            <pattern id="dashed-pattern-success" width="20" height="20" patternUnits="userSpaceOnUse"> {/* Unique ID */}
+                            <pattern id="dashed-pattern" width="20" height="20" patternUnits="userSpaceOnUse">
                                 <path d="M 0 10 L 10 10 M 10 0 L 10 10" stroke="currentColor" strokeWidth="0.5" strokeDasharray="2 2" />
                             </pattern>
                         </defs>
-                        <rect width="100%" height="100%" fill="url(#dashed-pattern-success)" className="text-green-500 dark:text-green-400"/>
+                        <rect width="100%" height="100%" fill="url(#dashed-pattern)" className="text-green-500 dark:text-green-400"/>
                     </svg>
                 </div>
+
+                  {/* Animated Checkmark */}
                 <motion.div
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
@@ -854,6 +924,8 @@ const VendorRegistration: React.FC = () => {
                 >
                   <Check className="w-10 h-10 text-white stroke-[3]" />
                 </motion.div>
+
+                {/* Success Message */}
                 <motion.h2
                   initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
                   className="text-3xl md:text-4xl font-bold mb-4 text-emerald-800 dark:text-emerald-200 tracking-tight"
@@ -866,6 +938,8 @@ const VendorRegistration: React.FC = () => {
                 >
                   Thank you for your interest! We've received your company profile and our procurement team will review your details. If your profile meets our requirements, we'll contact you to proceed with the formal vendor registration process.
                 </motion.p>
+
+                {/* Button to Reset */}
                 <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}>
                   <Button
                     variant="outline"
@@ -877,19 +951,42 @@ const VendorRegistration: React.FC = () => {
                     Submit Another Profile
                   </Button>
                 </motion.div>
+
+                {/* Confetti */}
                 <div className="success-confetti">
                   {[...Array(25)].map((_, i) => ( <div key={i} className={`confetti-item confetti-item-${i % 5}`}></div> ))}
                 </div>
               </motion.div>
             ) : (
+              // --- Form and Video Grid ---
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-start">
-                {/* Video Column (as before) */}
-                <div className="lg:order-1 lg:sticky lg:top-24 flex flex-col items-center">
+
+                {/* Video Column */}
+                <div
+                  className="lg:order-1 lg:sticky lg:top-24 flex flex-col items-center"
+                >
                   <div className="flex flex-col items-center bg-background/90 dark:bg-neutral-900/90 rounded-2xl p-4 border border-border/10 w-full max-w-sm mx-auto">
                     <div className="aspect-[9/16] w-full rounded-xl overflow-hidden shadow-xl mb-6">
-                      <video autoPlay muted loop playsInline className="w-full h-full object-cover" aria-label="Business partnership and vendor registration process visualization" poster="https://res.cloudinary.com/dada5hjp3/image/upload/v1744700600/vendor-registration-poster.jpg" preload="metadata">
-                        <source src="https://res.cloudinary.com/dada5hjp3/video/upload/v1744700600/0_Business_Agreement_1080x1920_tzq7hk.mp4" type="video/mp4"/>
-                        <track kind="descriptions" srcLang="en" src="/lovable-uploads/captions/vendor-registration-desc.vtt" label="English descriptions"/>
+                      <video
+                        autoPlay
+                        muted
+                        loop
+                        playsInline
+                        className="w-full h-full object-cover"
+                        aria-label="Business partnership and vendor registration process visualization"
+                        poster="https://res.cloudinary.com/dada5hjp3/image/upload/v1744700600/vendor-registration-poster.jpg"
+                        preload="metadata"
+                      >
+                        <source
+                          src="https://res.cloudinary.com/dada5hjp3/video/upload/v1744700600/0_Business_Agreement_1080x1920_tzq7hk.mp4"
+                          type="video/mp4"
+                        />
+                        <track
+                          kind="descriptions"
+                          srcLang="en" // Added srcLang
+                          src="/lovable-uploads/captions/vendor-registration-desc.vtt" // Ensure this path is correct
+                          label="English descriptions"
+                        />
                         Your browser does not support the video tag.
                       </video>
                     </div>
@@ -902,9 +999,15 @@ const VendorRegistration: React.FC = () => {
                   </div>
                 </div>
 
-                <motion.div key="form" className="lg:order-2" /* ... */ >
+                {/* Form Column */}
+                <motion.div
+                  key="form"
+                  className="lg:order-2"
+                  initial={{ opacity: 0, x: 30 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.8, delay: 0.3 }}
+                >
                   <Card className="w-full overflow-hidden shadow-xl dark:shadow-blue-950/10 border border-border/40 dark:border-neutral-800/60 rounded-2xl bg-card/80 dark:bg-neutral-900/80 backdrop-blur-lg">
-                    {/* ... CardHeader ... */}
                     <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-rashmi-red/80 via-blue-500/70 to-rashmi-red/80" aria-hidden="true"></div>
                     <CardHeader className="bg-muted/30 dark:bg-neutral-800/30 border-b border-border/30 dark:border-neutral-800/50 p-8">
                       <CardTitle id="form-heading" className="text-2xl md:text-3xl font-semibold tracking-tight text-foreground">Submit your vendor profile</CardTitle>
@@ -913,64 +1016,133 @@ const VendorRegistration: React.FC = () => {
                       </CardDescription>
                     </CardHeader>
                     <CardContent className="p-8 md:p-10">
-                      <form className="space-y-12" onSubmit={handleSubmit(onSubmit)} noValidate >
-                        {/* ... Contact Person Details ... */}
+                      <form
+                        className="space-y-12"
+                        onSubmit={handleSubmit(onSubmit)} // Simplified onSubmit call
+                        noValidate
+                      >
+                        {/* Contact Person Details */}
                         <div className="space-y-6">
                           <SectionHeader icon={User} title="Contact Person Details" description="Primary contact for communication" />
                           <div className="grid md:grid-cols-2 gap-x-6 gap-y-5">
                             <FormField label="Full Name" required id="name" error={errors.name?.message}>
-                              <Input id="name" placeholder="e.g., John Smith" className="bg-background/70" {...register("name", { required: "Full name is required" })} aria-invalid={errors.name ? "true" : "false"}/>
+                              <Input
+                                id="name"
+                                placeholder="e.g., John Smith"
+                                className="bg-background/70"
+                                {...register("name", { required: "Full name is required" })}
+                                aria-invalid={errors.name ? "true" : "false"}
+                              />
                             </FormField>
                             <FormField label="Designation" required id="designation" error={errors.designation?.message}>
-                              <Input id="designation" placeholder="e.g., Procurement Manager" className="bg-background/70" {...register("designation", { required: "Designation is required" })} aria-invalid={errors.designation ? "true" : "false"} />
+                              <Input
+                                id="designation"
+                                placeholder="e.g., Procurement Manager"
+                                className="bg-background/70"
+                                {...register("designation", { required: "Designation is required" })}
+                                aria-invalid={errors.designation ? "true" : "false"}
+                              />
                             </FormField>
                           </div>
                         </div>
-                        {/* ... Company Information ... */}
-                         <div className="space-y-6">
+
+                        {/* Company Information */}
+                        <div className="space-y-6">
                           <SectionHeader icon={Building} title="Company Information" description="Details about your organization" />
                           <FormField label="Company/Firm Name" required id="companyName" error={errors.companyName?.message}>
-                            <Input id="companyName" placeholder="Your company's registered name" className="bg-background/70" {...register("companyName", { required: "Company name is required" })} aria-invalid={errors.companyName ? "true" : "false"} />
+                            <Input
+                              id="companyName"
+                              placeholder="Your company's registered name"
+                              className="bg-background/70"
+                              {...register("companyName", { required: "Company name is required" })}
+                              aria-invalid={errors.companyName ? "true" : "false"}
+                            />
                           </FormField>
+
                           <div className="grid md:grid-cols-2 gap-x-6 gap-y-5">
                             <FormField label="Type of Firm" required id="firmType" error={errors.firmType?.message}>
-                              <Controller name="firmType" control={control} rules={{ required: "Please select a firm type" }}
+                              <Controller
+                                name="firmType"
+                                control={control}
+                                rules={{ required: "Please select a firm type" }}
                                 render={({ field }) => (
-                                  <Select onValueChange={field.onChange} value={field.value || ""} >
-                                    <SelectTrigger id="firmType-select" aria-invalid={errors.firmType ? "true" : "false"} className="bg-background/70">
+                                  <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value || ""}>
+                                    <SelectTrigger
+                                      id="firmType"
+                                      aria-invalid={errors.firmType ? "true" : "false"}
+                                      className="bg-background/70"
+                                    >
                                       <SelectValue placeholder="Select firm type..." />
                                     </SelectTrigger>
-                                    <SelectContent>{firmTypes.map(type => (<SelectItem key={type.id} value={type.id}>{type.label}</SelectItem>))}</SelectContent>
+                                    <SelectContent>
+                                      {firmTypes.map(type => (
+                                        <SelectItem key={type.id} value={type.id}>{type.label}</SelectItem>
+                                      ))}
+                                    </SelectContent>
                                   </Select>
                                 )}
                               />
                             </FormField>
                             <FormField label="Company Website" id="website" error={errors.website?.message}>
-                              <Input id="website" type="url" placeholder="https://example.com" className="bg-background/70"
-                                {...register("website", { pattern: { value: /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?$/, message: "Invalid website URL" }})}
+                              <Input
+                                id="website"
+                                type="url"
+                                placeholder="https://example.com"
+                                className="bg-background/70"
+                                {...register("website", {
+                                    pattern: { // Basic URL pattern
+                                        value: /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?$/,
+                                        message: "Please enter a valid website URL"
+                                    }
+                                })}
                                 aria-invalid={errors.website ? "true" : "false"}
                               />
                             </FormField>
                           </div>
+
+                          {/* Vendor Type and Country */}
                           <div className="space-y-5">
-                            {/* Vendor Type Switch */}
-                            <FormField label="Vendor Type" required id="vendorTypeField" error={errors.vendorType?.message} className="flex flex-row items-center justify-between space-y-0 rounded-md border p-4 bg-muted/30">
+                            <FormField
+                              label="Vendor Type"
+                              required
+                              id="vendorType" // ID for the conceptual field, not the switch itself
+                              error={errors.vendorType?.message}
+                              className="flex flex-row items-center justify-between space-y-0 rounded-md border p-4 bg-muted/30"
+                            >
                               <div className="space-y-0.5">
-                                <Label htmlFor="vendorTypeSwitch" className="text-base">{watchedVendorType === 'domestic' ? 'Domestic Vendor (India)' : 'Global Vendor'}</Label>
-                                <p className="text-sm text-muted-foreground">{watchedVendorType === 'domestic' ? 'For vendors based in India' : 'For international vendors'}</p>
+                                <Label htmlFor="vendorTypeSwitch" className="text-base"> {/* For Switch */}
+                                  {watchedVendorType === 'domestic' ? 'Domestic Vendor (India)' : 'Global Vendor'}
+                                </Label>
+                                <p className="text-sm text-muted-foreground">
+                                  {watchedVendorType === 'domestic'
+                                    ? 'For vendors based in India'
+                                    : 'For international vendors'}
+                                </p>
                               </div>
-                              <Controller name="vendorType" control={control} rules={{ required: "Vendor type is required" }}
+                              <Controller
+                                name="vendorType"
+                                control={control}
+                                rules={{ required: "Vendor type is required" }}
                                 render={({ field }) => (
-                                  <Switch id="vendorTypeSwitch" checked={field.value === 'global'}
+                                  <Switch
+                                    id="vendorTypeSwitch" // Specific ID for the switch element
+                                    checked={field.value === 'global'}
                                     onCheckedChange={(checked) => {
                                       const newVendorType = checked ? 'global' : 'domestic';
-                                      field.onChange(newVendorType);
-                                      // setValue('contactNo',''); // Let useEffect handle this.
+                                      field.onChange(newVendorType); // Update vendorType field
+
                                       if (newVendorType === 'domestic') {
                                         setValue('country', 'in', { shouldValidate: true });
-                                      } else if (watch('country') === 'in') {
-                                        const usCountry = countries.find(c => c.code === 'us');
-                                        setValue('country', usCountry?.code || '', { shouldValidate: true });
+                                      } else { // Switched to global
+                                        if (watch('country') === 'in') { // If country was India
+                                          const usCountry = sortableCountries.find(c => c.code === 'us');
+                                          if (usCountry) {
+                                            setValue('country', usCountry.code, { shouldValidate: true });
+                                          } else {
+                                            setValue('country', '', {shouldValidate: true}); // Clear or set other default
+                                          }
+                                        }
+                                        // If country was already global or 'others', leave it. useEffect will handle phone.
                                       }
                                     }}
                                     className="data-[state=checked]:bg-blue-600"
@@ -978,76 +1150,146 @@ const VendorRegistration: React.FC = () => {
                                 )}
                               />
                             </FormField>
-                            {/* Country Select */}
-                            <FormField label="Country" required id="country" error={errors.country?.message}>
-                              <Controller name="country" control={control} rules={{ required: "Country is required" }}
+
+                            <FormField
+                              label="Country"
+                              required
+                              id="country"
+                              error={errors.country?.message}
+                            >
+                              <Controller
+                                name="country"
+                                control={control}
+                                rules={{ required: "Country is required" }}
                                 render={({ field }) => (
                                   <div className="relative">
                                     <Select
                                       onValueChange={(value) => {
                                         field.onChange(value);
-                                        if (value !== 'others') { setCustomCountry(''); setCustomCountryCode(''); }
-                                        setCountrySearchTerm(''); // Reset search on select
-                                        trigger("contactNo");
+                                        if (value !== 'others') {
+                                          setCustomCountry('');
+                                          setCustomCountryCode('');
+                                        }
+                                        setCountrySearchQuery(''); // Clear search when country is selected
+                                        trigger("contactNo"); // Re-validate phone when country changes
                                       }}
+                                      defaultValue={field.value}
                                       value={field.value || ""}
-                                      disabled={isDomestic}
+                                      disabled={watchedVendorType === 'domestic'}
                                     >
-                                      <SelectTrigger id="country-select-trigger" aria-invalid={errors.country ? "true" : "false"} className={cn("bg-background/70", isDomestic && "opacity-70 cursor-not-allowed")}>
+                                      <SelectTrigger
+                                        id="country-select" // More specific ID
+                                        aria-invalid={errors.country ? "true" : "false"}
+                                        className={cn(
+                                          "bg-background/70",
+                                          watchedVendorType === 'domestic' && "opacity-70 cursor-not-allowed"
+                                        )}
+                                      >
                                         <div className="flex items-center gap-2">
-                                          {field.value && field.value !== 'others' && (<span className="inline-block w-5 text-center">{ {'in': '🇮🇳', 'us': '🇺🇸', 'gb': '🇬🇧', 'ca': '🇨🇦', 'au': '🇦🇺', 'jp': '🇯🇵', 'cn': '🇨🇳', 'de': '🇩🇪'}[field.value] || '🌍'}</span>)}
+                                          {field.value && field.value !== 'others' && (
+                                            <span className="inline-block w-5 text-center">
+                                              {/* Simplified emoji logic, can be expanded */}
+                                              { {'in': '🇮🇳', 'us': '🇺🇸', 'gb': '🇬🇧', 'ca': '🇨🇦', 'au': '🇦🇺', 'jp': '🇯🇵', 'cn': '🇨🇳', 'de': '🇩🇪'}[field.value] || '🌍'}
+                                            </span>
+                                          )}
                                           <SelectValue placeholder="Select country..." />
                                         </div>
                                       </SelectTrigger>
                                       <SelectContent className="max-h-80">
-                                        <div className="p-2 sticky top-0 bg-background z-10 border-b -mx-1 -mt-1"> {/* Negative margin to fill SelectContent padding */}
-                                          <Input placeholder="Search country..." value={countrySearchTerm} onChange={(e) => setCountrySearchTerm(e.target.value)} className="bg-muted/50 h-9" aria-label="Search countries"/>
-                                        </div>
-                                        <div className="pt-1 overflow-y-auto" style={{maxHeight: 'calc(20rem - 3rem)'}}> {/* Adjust maxHeight if needed */}
-                                          {filteredCountries.length > 0 ? filteredCountries.map(country => (
-                                            <SelectItem key={country.code} value={country.code} data-country-name={country.name} className="cursor-pointer py-2">
-                                              <div className="flex items-center justify-between w-full">
-                                                <span>{country.name}</span>
-                                                {country.code !== 'others' && <span className="text-xs text-muted-foreground">{country.countryCode}</span>}
-                                              </div>
-                                            </SelectItem>
-                                          )) : <p className="p-2 text-sm text-muted-foreground text-center">No countries found.</p>}
-                                        </div>
+                                          <div className="p-2 sticky top-0 bg-background z-10 border-b">
+                                              <Input
+                                                placeholder="Search countries..."
+                                                value={countrySearchQuery}
+                                                onChange={(e) => setCountrySearchQuery(e.target.value)}
+                                                className="h-8 text-sm"
+                                                autoFocus={false}
+                                              />
+                                          </div>
+                                        {filteredCountries.map(country => (
+                                          <SelectItem
+                                            key={country.code}
+                                            value={country.code}
+                                            data-country-item
+                                            data-country-name={country.name}
+                                            className="cursor-pointer"
+                                          >
+                                            <span>{country.name}</span>
+                                          </SelectItem>
+                                        ))}
+                                        {filteredCountries.length === 0 && countrySearchQuery.trim() && (
+                                          <div className="p-3 text-center text-sm text-muted-foreground">
+                                            No countries found matching "{countrySearchQuery}"
+                                          </div>
+                                        )}
                                       </SelectContent>
                                     </Select>
-                                    {isDomestic && (<div className="absolute right-3 top-1/2 -translate-y-1/2 px-1.5 py-0.5 rounded-sm bg-muted text-muted-foreground text-xs pointer-events-none">India Only</div>)}
+                                    {watchedVendorType === 'domestic' && (
+                                      <div className="absolute right-3 top-1/2 -translate-y-1/2 px-1.5 py-0.5 rounded-sm bg-muted text-muted-foreground text-xs pointer-events-none">
+                                        India Only
+                                      </div>
+                                    )}
                                   </div>
                                 )}
                               />
                               {isOtherCountrySelected && (
                                 <div className="mt-3 space-y-3">
-                                  <Input placeholder="Enter your country name" value={customCountry} onChange={e => { setCustomCountry(e.target.value); trigger("contactNo"); }} className="bg-background/70"/>
+                                  <Input
+                                    placeholder="Enter your country name"
+                                    value={customCountry}
+                                    onChange={e => {
+                                        setCustomCountry(e.target.value);
+                                        trigger("contactNo"); // Re-validate phone when custom country changes
+                                    }}
+                                    className="bg-background/70"
+                                  />
                                   <div className="relative">
                                     <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground select-none">+</span>
-                                    <Input placeholder="Dial code (e.g., 975)" value={customCountryCode.replace(/^\+/, '')}
+                                    <Input
+                                      placeholder="Dial code (e.g., 975)"
+                                      value={customCountryCode.replace(/^\+/, '')}
                                       onChange={e => {
-                                        const val = e.target.value.replace(/\D/g, '');
-                                        setCustomCountryCode(val ? `+${val}` : '');
-                                        trigger("contactNo");
+                                        const value = e.target.value.replace(/\D/g, '');
+                                        setCustomCountryCode(value ? `+${value}` : '');
+                                        trigger("contactNo"); // Re-validate phone
                                       }}
-                                      className="bg-background/70 pl-7" type="tel" maxLength={4}
+                                      className="bg-background/70 pl-7" // Increased padding for '+'
+                                      type="tel"
+                                      maxLength={4} // Max 3 digits for code + potentially '+'
                                     />
                                   </div>
                                 </div>
                               )}
-                               {!errors.country && !isDomestic && ( <p className="text-xs text-muted-foreground mt-1">Select country or "Others".</p>)}
+                              {!errors.country && watchedVendorType === 'global' && (
+                                <p className="text-xs text-muted-foreground mt-1">
+                                  Select country or "Others" if not listed.
+                                </p>
+                              )}
                             </FormField>
-                            {/* GST Number */}
-                            {isDomestic && (
+
+                            {watchedVendorType === 'domestic' && (
                               <FormField label="GST Number (Optional)" id="gstNumber" error={errors.gstNumber?.message}>
                                 <div className="relative">
-                                  <Input id="gstNumber" placeholder="e.g., 22AAAAA0000A1Z5" className="bg-background/70 uppercase"
-                                    {...register("gstNumber", { pattern: { value: /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/, message: "Invalid GST Number format"}})}
-                                    aria-invalid={errors.gstNumber ? "true" : "false"} maxLength={15} onInput={(e) => e.currentTarget.value = e.currentTarget.value.toUpperCase()}
+                                  <Input
+                                    id="gstNumber"
+                                    placeholder="e.g., 22AAAAA0000A1Z5"
+                                    className="bg-background/70 uppercase"
+                                    {...register("gstNumber", {
+                                      pattern: {
+                                        value: /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/,
+                                        message: "Invalid GST Number format"
+                                      }
+                                    })}
+                                    aria-invalid={errors.gstNumber ? "true" : "false"}
+                                    maxLength={15}
+                                    onInput={(e) => e.currentTarget.value = e.currentTarget.value.toUpperCase()}
                                   />
-                                  <div className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground bg-background/90 px-1 rounded">15 chars</div>
+                                   <div className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground bg-background/90 px-1 rounded">
+                                    15 characters
+                                   </div>
                                 </div>
-                                <p className="text-xs text-muted-foreground mt-1">Helps expedite verification.</p>
+                                <p className="text-xs text-muted-foreground mt-1">
+                                  Helps expedite vendor verification.
+                                </p>
                               </FormField>
                             )}
                           </div>
@@ -1060,146 +1302,355 @@ const VendorRegistration: React.FC = () => {
                             <FormField label="Contact Number" required id="contactNo" error={errors.contactNo?.message}>
                               <div className="relative">
                                 {shouldShowCountryCodeBadge && (
-                                  <div className="absolute left-0 top-0 bottom-0 flex items-center pl-3 select-none">
-                                    <span className="bg-muted/80 text-muted-foreground rounded px-1.5 py-0.5 text-xs font-medium">
-                                      {activeDialCode}
-                                    </span>
+                                  <div className="absolute left-3 top-1/2 -translate-y-1/2 bg-muted/80 text-muted-foreground rounded px-1.5 py-0.5 text-xs font-medium select-none">
+                                    {activeDialCode}
                                   </div>
                                 )}
                                 <Input
-                                  id="contactNoInput" // Different ID from FormField to avoid label conflict if any
+                                  id="contactNo"
                                   type="tel"
                                   placeholder={contactPlaceholder}
                                   className={cn(
                                     "bg-background/70",
-                                    shouldShowCountryCodeBadge && "pl-[calc(0.75rem+2.5rem+0.5rem)]" // Adjust padding: base + badge width + space
+                                    shouldShowCountryCodeBadge && "pl-[calc(0.75rem+3.5rem)]" // Adjust padding based on badge size
                                   )}
-                                  value={contactNoDisplayValue} // Display transformed value
-                                  onChange={handleContactNoInputChange} // Custom handler
-                                  onBlur={() => trigger("contactNo")} // Trigger validation on blur
+                                  {...register("contactNo", {
+                                    required: "Contact number is required",
+                                    onChange: handlePhoneChange, // Use the memoized handler
+                                    validate: (value) => {
+                                        // Re-calculate activeDialCode for validation context as it might not be updated yet if this runs before useEffect
+                                        const currentType = watch('vendorType');
+                                        const currentCountryVal = watch('country');
+                                        let validatingDialCode = '';
+                                        if (currentType === 'domestic') {
+                                            validatingDialCode = '+91';
+                                        } else if (currentCountryVal === 'others') {
+                                            validatingDialCode = customCountryCode;
+                                        } else {
+                                            const countryData = countries.find(c => c.code === currentCountryVal);
+                                            validatingDialCode = countryData?.countryCode || '';
+                                        }
+                                        return validatePhoneNumber(value, validatingDialCode) ||
+                                        `Invalid phone number for ${countries.find(c=>c.countryCode === validatingDialCode)?.name || 'selected region'}.`;
+                                    }
+                                  })}
                                   aria-invalid={errors.contactNo ? "true" : "false"}
                                 />
-                                {/* Hidden input for react-hook-form register to capture the full number for validation logic if needed, though setValue is primary */}
-                                <input type="hidden" {...register("contactNo", {
-                                     required: "Contact number is required",
-                                     validate: (value) => validatePhoneNumber(value, activeDialCode) || `Invalid phone for ${countries.find(c => c.countryCode === activeDialCode)?.name || 'selected region'}.`
-                                 })} />
                               </div>
-                               {!errors.contactNo && (<p className="text-xs text-muted-foreground mt-1">{isDomestic ? '10-digit mobile.' : 'Enter national number.'}</p>)}
+                              {!errors.contactNo && (
+                                <p className="text-xs text-muted-foreground mt-1">
+                                  {isDomestic
+                                    ? 'Enter a 10-digit mobile number.'
+                                    : 'Include country code if not already shown.'}
+                                </p>
+                              )}
                             </FormField>
                             <FormField label="Email Address" required id="email" error={errors.email?.message}>
-                              <Input id="email" type="email" placeholder="contact@yourcompany.com" className="bg-background/70"
-                                {...register("email", { required: "Email is required", pattern: { value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i, message: "Invalid email format"}})}
+                              <Input
+                                id="email"
+                                type="email"
+                                placeholder="contact@yourcompany.com"
+                                className="bg-background/70"
+                                {...register("email", {
+                                  required: "Email is required",
+                                  pattern: {
+                                    value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                                    message: "Invalid email address format"
+                                  }
+                                })}
                                 aria-invalid={errors.email ? "true" : "false"}
                               />
                             </FormField>
                           </div>
                         </div>
-                        
-                        {/* ... Product/Service Information, File Upload, Terms, Submit Button ... (largely as before) */}
+
+                        {/* Product/Service Information */}
                         <div className="space-y-6">
                           <SectionHeader icon={Briefcase} title="Product/Service Information" description="Details about what you offer" />
                           <FormField label="Primary Category" required id="category" error={errors.category?.message}>
-                            <Controller name="category" control={control} rules={{ required: "Please select a category" }}
+                            <Controller
+                              name="category"
+                              control={control}
+                              rules={{ required: "Please select a category" }}
                               render={({ field }) => (
-                                <Select onValueChange={field.onChange} value={field.value || ""}>
-                                  <SelectTrigger id="category-select-trigger" aria-invalid={errors.category ? "true" : "false"} className="bg-background/70">
+                                <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value || ""}>
+                                  <SelectTrigger
+                                    id="category-select"
+                                    aria-invalid={errors.category ? "true" : "false"}
+                                    className="bg-background/70"
+                                  >
                                     <SelectValue placeholder="Select primary category..." />
                                   </SelectTrigger>
-                                  <SelectContent className="max-h-80">{categories.map(cat => (<SelectItem key={cat.id} value={cat.id}>{cat.label}</SelectItem>))}</SelectContent>
+                                  <SelectContent className="max-h-80">
+                                    {categories.map(cat => (
+                                      <SelectItem key={cat.id} value={cat.id}>{cat.label}</SelectItem>
+                                    ))}
+                                  </SelectContent>
                                 </Select>
                               )}
                             />
                           </FormField>
                           <FormField label="Product/Service Description" required id="productDescription" error={errors.productDescription?.message}>
-                            <Textarea id="productDescription" rows={4} placeholder="Describe your core offerings..." className="bg-background/70 resize-y"
-                              {...register("productDescription", { required: "Description is required", minLength: { value: 20, message: "Min 20 chars." }})}
+                            <Textarea
+                              id="productDescription"
+                              rows={4}
+                              placeholder="Describe your core offerings, key features, and capabilities."
+                              className="bg-background/70 resize-y"
+                              {...register("productDescription", {
+                                required: "Description is required",
+                                minLength: { value: 20, message: "Min 20 chars." }
+                              })}
                               aria-invalid={errors.productDescription ? "true" : "false"}
                             />
                           </FormField>
                           <FormField label="Major Clients or Projects (Optional)" id="majorClients" error={errors.majorClients?.message}>
-                            <Textarea id="majorClients" rows={3} placeholder="List key clients, projects..." className="bg-background/70 resize-y" {...register("majorClients")} />
+                            <Textarea
+                              id="majorClients"
+                              rows={3}
+                              placeholder="List key clients, projects, or industries you serve."
+                              className="bg-background/70 resize-y"
+                              {...register("majorClients")}
+                            />
                           </FormField>
+
                           <div className="mt-6">
-                            <FormField label="Last Year Turnover" required id="turnoverField" error={errors.turnover?.message || errors.turnoverCurrency?.message}>
+                            <FormField label="Last Year Turnover" required id="turnover" error={errors.turnover?.message || errors.turnoverCurrency?.message}>
                               <div className="flex items-center gap-3">
                                 <div className="flex-1">
-                                  <Input id="turnover" type="number" step="0.01" inputMode="decimal" placeholder="Enter turnover value" className="bg-background/70"
-                                    {...register("turnover", { required: "Turnover value is required", valueAsNumber: true, min: { value: 0, message: "Must be positive" }})}
+                                  <Input
+                                    id="turnover"
+                                    type="number"
+                                    step="0.01"
+                                    inputMode="decimal"
+                                    placeholder="Enter turnover value"
+                                    className="bg-background/70"
+                                    {...register("turnover", {
+                                        required: "Turnover value is required",
+                                        valueAsNumber: true,
+                                        min: { value: 0, message: "Turnover must be positive" }
+                                    })}
                                     aria-invalid={errors.turnover ? "true" : "false"}
                                   />
                                 </div>
                                 <div className="w-40">
-                                  <Controller name="turnoverCurrency" control={control} rules={{ required: "Currency is required" }}
+                                  <Controller
+                                    name="turnoverCurrency"
+                                    control={control}
+                                    rules={{ required: "Currency is required" }}
                                     render={({ field }) => (
-                                      <Select onValueChange={field.onChange} value={field.value || "INR"}>
-                                        <SelectTrigger id="turnoverCurrency-select" className="bg-background/70"><SelectValue placeholder="Currency" /></SelectTrigger>
-                                        <SelectContent><SelectItem value="INR">Rs (in Cr)</SelectItem><SelectItem value="USD">USD (in Million)</SelectItem></SelectContent>
+                                      <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value || "INR"}>
+                                        <SelectTrigger id="turnoverCurrency" className="bg-background/70">
+                                          <SelectValue placeholder="Currency" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                          <SelectItem value="INR">Rs (in Cr)</SelectItem>
+                                          <SelectItem value="USD">USD (in Million)</SelectItem>
+                                        </SelectContent>
                                       </Select>
                                     )}
                                   />
                                 </div>
                               </div>
-                              <p className="text-xs text-muted-foreground mt-1">{watch('turnoverCurrency') === 'INR' ? 'Value in Crores (e.g., 10.5)' : 'Value in Millions (e.g., 2.5)'}</p>
+                              <p className="text-xs text-muted-foreground mt-1">
+                                {watch('turnoverCurrency') === 'INR'
+                                  ? 'Value in Crores (e.g., 10.5 for ₹10.5 Cr)'
+                                  : 'Value in Millions (e.g., 2.5 for $2.5 M)'}
+                              </p>
                             </FormField>
                           </div>
                         </div>
 
+                        {/* File Upload */}
                         <div className="space-y-3 pt-4">
-                          <Label htmlFor="file-upload-label" className="flex items-center text-lg font-semibold text-foreground tracking-tight"><Upload className="mr-2 h-5 w-5 text-rashmi-red" />Supporting Documents (Optional)</Label>
-                          <p className="text-sm text-muted-foreground/90 mb-3">Upload up to 3 files (PDF/Word, Max {MAX_FILE_SIZE_MB}MB each)</p>
+                          <Label htmlFor="file-upload-label" className="flex items-center text-lg font-semibold text-foreground tracking-tight">
+                            <Upload className="mr-2 h-5 w-5 text-rashmi-red" />
+                            Supporting Documents (Optional)
+                          </Label>
+                          <p className="text-sm text-muted-foreground/90 mb-3">
+                            Upload up to 3 files: company profile, brochures, certifications, etc. (PDF/Word, Max {MAX_FILE_SIZE_MB}MB each)
+                          </p>
+
                           <div className="flex items-center justify-between mb-2">
-                            <span className="text-sm text-muted-foreground">{files.length > 0 ? `${files.length} of 3 files selected` : 'No files selected'}</span>
-                            {files.length > 0 && (<Button type="button" variant="ghost" size="sm" onClick={clearAllFiles} className="text-sm text-muted-foreground hover:text-destructive" disabled={isSubmitting}>Clear all</Button>)}
+                            <span className="text-sm text-muted-foreground">
+                              {files.length > 0 ? `${files.length} of 3 files selected` : 'No files selected'}
+                            </span>
+                            {files.length > 0 && (
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => clearAllFiles()}
+                                className="text-sm text-muted-foreground hover:text-destructive"
+                                disabled={isSubmitting}
+                              >
+                                Clear all
+                              </Button>
+                            )}
                           </div>
-                          <div className={cn( "relative flex flex-col items-center justify-center w-full min-h-[12rem] border-2 border-dashed rounded-xl cursor-pointer transition-all group", isDragging ? "border-rashmi-red bg-rashmi-red/10 scale-[1.02]" : "border-border/60 hover:border-rashmi-red/50 hover:bg-muted/30 bg-muted/20", fileErrors.some(e=>!e.startsWith("Maximum 3 files")) ? "border-destructive bg-destructive/10" : "", files.length > 0 || isSubmitting ? "border-solid" : "" )}
-                            onDrop={handleFileDrop} onDragOver={handleDragOver} onDragLeave={handleDragLeave} onClick={() => files.length < 3 && document.getElementById('file-upload')?.click()} role="button" tabIndex={0} onKeyPress={(e) => { if (e.key === 'Enter' || e.key === ' ') { files.length < 3 && document.getElementById('file-upload')?.click();}}} aria-labelledby="file-upload-label"
+
+                          <div
+                            className={cn(
+                              "relative flex flex-col items-center justify-center w-full min-h-[12rem] border-2 border-dashed rounded-xl cursor-pointer transition-all duration-300 ease-in-out group",
+                              isDragging ? "border-rashmi-red bg-rashmi-red/10 scale-[1.02] shadow-lg" : "border-border/60 hover:border-rashmi-red/50 hover:bg-muted/30 bg-muted/20",
+                              fileErrors.some(err => !err.startsWith("Maximum 3 files allowed.") && !err.startsWith("Submission failed")) ? "border-destructive bg-destructive/10" : "", // More specific error styling
+                              files.length > 0 || isSubmitting ? "border-solid" : ""
+                            )}
+                            onDrop={handleFileDrop}
+                            onDragOver={handleDragOver}
+                            onDragLeave={handleDragLeave}
+                            onClick={() => files.length < 3 && document.getElementById('file-upload')?.click()}
+                            role="button" // Make it clear it's clickable
+                            tabIndex={0} // Make it focusable
+                            onKeyPress={(e) => { if (e.key === 'Enter' || e.key === ' ') { files.length < 3 && document.getElementById('file-upload')?.click();}}}
+                            aria-labelledby="file-upload-label"
                           >
-                            <input id="file-upload" name="file-upload" type="file" multiple className="sr-only" onChange={handleFileChange} accept={ALLOWED_FILE_TYPES.join(',')} disabled={files.length >= 3 || isSubmitting}/>
+                            <input
+                              id="file-upload"
+                              name="file-upload" // Name attribute for forms
+                              type="file"
+                              multiple
+                              className="sr-only"
+                              onChange={handleFileChange}
+                              accept={ALLOWED_FILE_TYPES.join(',')}
+                              disabled={files.length >= 3 || isSubmitting}
+                            />
+
                             {files.length > 0 ? (
                               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 w-full p-4">
                                 {files.map((file, index) => (
-                                  <div key={file.name + index} className="relative flex flex-col items-center p-3 bg-card/90 backdrop-blur-sm rounded-lg border border-border/30">
-                                    <div className="mb-2 w-full h-24 flex items-center justify-center"><FileText className="h-10 w-10 text-rashmi-red/80" /></div>
-                                    <div className="text-center w-full"><p className="text-xs font-medium text-foreground truncate max-w-full px-1" title={fileNames[index]}>{fileNames[index]}</p><p className="text-xs text-muted-foreground mt-0.5">{(file.size / 1024 / 1024).toFixed(2)} MB</p></div>
-                                    <Button type="button" variant="ghost" size="icon" onClick={(e) => clearFile(index, e)} className="absolute -top-2 -right-2 h-7 w-7 p-0 rounded-full bg-card/90 border hover:bg-destructive/10 hover:text-destructive" disabled={isSubmitting} aria-label={`Remove ${fileNames[index]}`}><X size={14} /></Button>
+                                  <div
+                                    key={file.name + index} // More robust key
+                                    className="relative flex flex-col items-center p-3 bg-card/90 backdrop-blur-sm rounded-lg border border-border/30"
+                                  >
+                                    <div className="mb-2 relative w-full h-24 flex items-center justify-center">
+                                      <FileText className="h-10 w-10 text-rashmi-red/80" />
+                                    </div>
+                                    <div className="text-center w-full">
+                                      <p className="text-xs font-medium text-foreground truncate max-w-full px-1" title={fileNames[index]}>
+                                        {fileNames[index]}
+                                      </p>
+                                      <p className="text-xs text-muted-foreground mt-0.5">
+                                        {(file.size / 1024 / 1024).toFixed(2)} MB
+                                      </p>
+                                    </div>
+                                    <Button
+                                      type="button"
+                                      variant="ghost"
+                                      size="icon" // Changed to icon for smaller footprint
+                                      onClick={(e) => clearFile(index, e)}
+                                      className="absolute -top-2 -right-2 h-7 w-7 p-0 rounded-full bg-card/90 border border-border/50 hover:bg-destructive/10 hover:text-destructive"
+                                      disabled={isSubmitting}
+                                      aria-label={`Remove ${fileNames[index]}`}
+                                    >
+                                      <X size={14} />
+                                    </Button>
                                   </div>
                                 ))}
                                 {files.length < 3 && (
-                                  <div className="flex flex-col items-center justify-center p-3 bg-muted/30 rounded-lg border border-dashed cursor-pointer hover:bg-muted/50 min-h-[10rem]" onClick={() => document.getElementById('file-upload')?.click()} role="button" tabIndex={0} onKeyPress={(e) => { if (e.key === 'Enter' || e.key === ' ') document.getElementById('file-upload')?.click();}} aria-label="Add more files">
-                                    <Plus className="h-10 w-10 text-muted-foreground/50 mb-2" /><p className="text-xs text-muted-foreground">Add file</p>
+                                  <div
+                                    className="flex flex-col items-center justify-center p-3 bg-muted/30 backdrop-blur-sm rounded-lg border border-dashed border-border/50 cursor-pointer hover:bg-muted/50 transition-colors min-h-[10rem]" // Ensure placeholder is clickable
+                                    onClick={() => document.getElementById('file-upload')?.click()}
+                                    role="button"
+                                    tabIndex={0}
+                                    onKeyPress={(e) => { if (e.key === 'Enter' || e.key === ' ') { document.getElementById('file-upload')?.click();}}}
+                                    aria-label="Add more files"
+                                  >
+                                    <Plus className="h-10 w-10 text-muted-foreground/50 mb-2" />
+                                    <p className="text-xs text-muted-foreground">Add file</p>
                                   </div>
                                 )}
                               </div>
                             ) : (
                               <div className="text-center p-6 flex flex-col items-center justify-center">
-                                <Upload className={cn("h-14 w-14 mb-4", isDragging ? "text-rashmi-red" : "text-muted-foreground/60")} />
-                                <p className="font-semibold text-lg text-foreground">{isDragging ? "Drop files here!" : <><span className="text-rashmi-red">Click to upload</span> or drag & drop</>}</p>
-                                <p className="text-xs text-muted-foreground mt-1.5">PDF or Word (up to 3 files)</p>
+                                <Upload className={cn("h-14 w-14 mb-4 transition-colors", isDragging ? "text-rashmi-red" : "text-muted-foreground/60")} />
+                                <p className="font-semibold text-lg text-foreground">
+                                  {isDragging ? "Drop files here!" : <> <span className="text-rashmi-red">Click to upload</span> or drag & drop</>}
+                                </p>
+                                <p className="text-xs text-muted-foreground mt-1.5">
+                                  PDF or Word documents only (up to 3 files)
+                                </p>
                               </div>
                             )}
-                            {isSubmitting && uploadProgress > 0 && ( /* Upload Progress Overlay ... */ <div className="absolute inset-0 bg-background/70 backdrop-blur-sm flex items-center justify-center rounded-xl p-4"><div className="w-full max-w-xs text-center"><Loader2 className="h-8 w-8 text-rashmi-red animate-spin mx-auto mb-3" /><p className="text-sm font-medium text-foreground mb-2">Uploading...</p><Progress value={uploadProgress} className="h-2" /><p className="text-xs text-muted-foreground mt-1">{Math.min(uploadProgress,100)}%</p></div></div>)}
+
+                            {isSubmitting && uploadProgress > 0 && (
+                              <div className="absolute inset-0 bg-background/70 backdrop-blur-sm flex items-center justify-center rounded-xl p-4">
+                                <div className="w-full max-w-xs text-center">
+                                  <Loader2 className="h-8 w-8 text-rashmi-red animate-spin mx-auto mb-3" />
+                                  <p className="text-sm font-medium text-foreground mb-2">Uploading...</p>
+                                  <Progress value={uploadProgress} className="h-2" />
+                                  <p className="text-xs text-muted-foreground mt-1">{Math.min(uploadProgress, 100)}%</p>
+                                </div>
+                              </div>
+                            )}
                           </div>
-                          {fileErrors.length > 0 && (<div className="mt-3 space-y-1">{fileErrors.map((error, index) => (<p key={index} className="text-sm text-destructive flex items-center gap-1.5"><AlertCircle size={14} />{error}</p>))}<Button type="button" variant="link" size="sm" onClick={() => setFileErrors([])} className="text-xs text-muted-foreground mt-1 hover:text-destructive p-0 h-auto">Clear errors</Button></div>)}
+
+                          {fileErrors.length > 0 && (
+                            <div className="mt-3 space-y-1"> {/* Adjusted spacing for multiple errors */}
+                              {fileErrors.map((error, index) => (
+                                <p key={index} className="text-sm text-destructive flex items-center gap-1.5"> {/* Increased gap */}
+                                  <AlertCircle size={14} /> {error}
+                                </p>
+                              ))}
+                              <Button
+                                type="button"
+                                variant="link" // Changed to link for less emphasis
+                                size="sm"
+                                onClick={() => setFileErrors([])}
+                                className="text-xs text-muted-foreground mt-1 hover:text-destructive p-0 h-auto" // Adjusted hover
+                              >
+                                Clear errors
+                              </Button>
+                            </div>
+                          )}
                         </div>
 
+                        {/* Terms and Submit */}
                         <div className="pt-6 space-y-8">
                           <div className="flex items-start space-x-3 rounded-lg border border-border/50 p-4 bg-muted/20">
-                            <Controller name="terms" control={control} rules={{ required: "You must agree to the terms" }}
+                            <Controller
+                              name="terms"
+                              control={control}
+                              rules={{ required: "You must agree to the terms" }}
                               render={({ field }) => (
-                                <Checkbox id="terms-checkbox" checked={field.value} onCheckedChange={field.onChange} aria-invalid={errors.terms ? "true" : "false"} className={cn("mt-0.5 data-[state=checked]:bg-rashmi-red data-[state=checked]:border-rashmi-red", errors.terms ? "border-destructive" : "border-muted-foreground/50")}/>
+                                <Checkbox
+                                  id="terms"
+                                  checked={field.value}
+                                  onCheckedChange={field.onChange}
+                                  aria-invalid={errors.terms ? "true" : "false"}
+                                  className={cn(
+                                    "mt-0.5 data-[state=checked]:bg-rashmi-red data-[state=checked]:border-rashmi-red border-muted-foreground/50",
+                                    errors.terms ? "border-destructive" : ""
+                                  )}
+                                />
                               )}
                             />
                             <div className="grid gap-1.5 leading-none flex-1">
-                              <Label htmlFor="terms-checkbox" className="text-sm font-medium text-foreground/90 cursor-pointer">I confirm all information is accurate and consent to having my profile reviewed for potential vendor registration.<span className="text-destructive">*</span></Label>
-                              {errors.terms && <p className="text-xs text-destructive flex items-center gap-1"><AlertCircle size={13} />{errors.terms.message}</p>}
+                              <Label htmlFor="terms" className="text-sm font-medium text-foreground/90 cursor-pointer">
+                                I confirm all information is accurate and consent to having my profile reviewed for potential vendor registration.
+                                <span className="text-destructive">*</span>
+                              </Label>
+                              {errors.terms && <p className="text-xs text-destructive flex items-center gap-1"><AlertCircle size={13} /> {errors.terms.message}</p>}
                             </div>
                           </div>
-                          <Button type="submit" className="w-full bg-gradient-to-r from-rashmi-red to-red-700 hover:from-rashmi-red/90 hover:to-red-700/90 text-white py-6 text-lg font-semibold rounded-xl shadow-md hover:shadow-lg" disabled={isSubmitting || (Object.keys(errors).length > 0 && !errors.terms)}>
-                            {isSubmitting ? (<span className="flex items-center justify-center"><Loader2 className="mr-2 h-5 w-5 animate-spin" />Processing...</span>) : (<span className="flex items-center justify-center">Submit Profile <Check className="ml-2 h-5 w-5" /></span>)}
+
+                          <Button
+                            type="submit"
+                            className="w-full bg-gradient-to-r from-rashmi-red to-red-700 hover:from-rashmi-red/90 hover:to-red-700/90 text-white py-6 text-lg font-semibold rounded-xl shadow-md hover:shadow-lg transition-all duration-300"
+                            disabled={isSubmitting || Object.keys(errors).length > 0 && !errors.terms /* Disable if other errors exist besides terms before interaction */}
+                          >
+                            {isSubmitting ? (
+                              <span className="flex items-center justify-center">
+                                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                                Processing Submission...
+                              </span>
+                            ) : (
+                              <span className="flex items-center justify-center">
+                                Submit Profile
+                                <Check className="ml-2 h-5 w-5" />
+                              </span>
+                            )}
                           </Button>
                         </div>
-
                       </form>
                     </CardContent>
                   </Card>
@@ -1210,7 +1661,7 @@ const VendorRegistration: React.FC = () => {
         </div>
       </motion.section>
 
-      {/* ... Benefits Section ... (as before) */}
+      {/* Benefits Section */}
       <section
         className="py-24 relative bg-gradient-to-b from-blue-50/20 to-background dark:from-blue-950/20 dark:to-neutral-950 overflow-hidden"
         style={{
@@ -1225,11 +1676,11 @@ const VendorRegistration: React.FC = () => {
           <div className="absolute -left-[10%] bottom-[5%] w-1/2 h-1/2 bg-blue-500/5 dark:bg-blue-900/10 rounded-full blur-3xl opacity-40 parallax-bg" data-speed="-0.15"></div>
           <svg className="absolute inset-0 h-full w-full stroke-gray-300/20 dark:stroke-neutral-700/20 [mask-image:radial-gradient(100%_100%_at_center_center,white,transparent)]" aria-hidden="true">
             <defs>
-              <pattern id="benefits-pattern-unique" width="60" height="60" x="50%" y="-1" patternUnits="userSpaceOnUse"> {/* Unique ID */}
+              <pattern id="benefits-pattern" width="60" height="60" x="50%" y="-1" patternUnits="userSpaceOnUse">
                 <path d="M.5 60 V.5 H60" fill="none"/>
               </pattern>
             </defs>
-            <rect width="100%" height="100%" strokeWidth="0" fill="url(#benefits-pattern-unique)"/>
+            <rect width="100%" height="100%" strokeWidth="0" fill="url(#benefits-pattern)"/>
           </svg>
         </div>
 
@@ -1283,7 +1734,7 @@ const VendorRegistration: React.FC = () => {
                   <div className="p-6 pb-8 flex-grow relative z-10 flex flex-col">
                     <div
                       className="mb-5 inline-flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br from-background to-muted/60 dark:from-neutral-700 dark:to-neutral-800/50 shadow-md border border-border/20 dark:border-neutral-600/50"
-                      aria-hidden="true" 
+                      aria-hidden="true" // Decorative icon, label provided by ariaLabel on parent or title
                     >
                       <BenefitIcon className="h-7 w-7 text-rashmi-red" />
                     </div>
@@ -1316,7 +1767,9 @@ const VendorRegistration: React.FC = () => {
       </section>
 
       <style>{`
-        /* ... (CSS styles as before, ensure Radix popper z-index is high) ... */
+        /* Font imports (ensure these are loaded, e.g., in public/index.html or via a global CSS file) */
+        /* @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400..700&family=Lexend:wght@100..900&display=swap'); */
+
         :root {
           --font-display: 'Lexend', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
           --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
@@ -1332,8 +1785,8 @@ const VendorRegistration: React.FC = () => {
 
         .parallax-bg {
           will-change: transform;
-          transform: translateZ(0); 
-          backface-visibility: hidden; 
+          transform: translateZ(0); /* Promotes to its own layer */
+          backface-visibility: hidden; /* Helps with flickering on some browsers */
         }
 
         .success-confetti {
@@ -1351,11 +1804,11 @@ const VendorRegistration: React.FC = () => {
         }
         @keyframes confetti-fall {
           0% {
-            transform: translateY(-150px) rotate(0deg) scale(1.2); 
+            transform: translateY(-150px) rotate(0deg) scale(1.2); /* Start slightly larger */
             opacity: 1;
           }
           100% {
-            transform: translateY(calc(100vh + 150px)) rotate(720deg) scale(0.5); 
+            transform: translateY(calc(100vh + 150px)) rotate(720deg) scale(0.5); /* Fall further and shrink */
             opacity: 0;
           }
         }
@@ -1374,15 +1827,30 @@ const VendorRegistration: React.FC = () => {
           scroll-behavior: smooth;
         }
 
-        ::-webkit-scrollbar { width: 8px; height: 8px; }
-        ::-webkit-scrollbar-track { background: hsl(var(--background) / 0.1); }
-        ::-webkit-scrollbar-thumb { background-color: hsl(var(--border) / 0.5); border-radius: 10px; border: 2px solid transparent; background-clip: content-box; }
-        ::-webkit-scrollbar-thumb:hover { background-color: hsl(var(--border)); }
-        
-        [data-radix-popper-content-wrapper] {
-            z-index: 9999 !important;
+        /* Subtle Scrollbar for Webkit browsers */
+        ::-webkit-scrollbar {
+          width: 8px;
+          height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+          background: hsl(var(--background) / 0.1); /* Use theme variable */
+        }
+        ::-webkit-scrollbar-thumb {
+          background-color: hsl(var(--border) / 0.5); /* Use theme variable */
+          border-radius: 10px;
+          border: 2px solid transparent;
+          background-clip: content-box;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+          background-color: hsl(var(--border)); /* Use theme variable */
+        }
+
+        /* Ensure SelectContent from Radix/Shadcn is above other elements */
+        [data-radix-popper-content-wrapper] { /* More specific selector for Radix popper */
+            z-index: 9999 !important; /* Ensure it's on top, use !important if necessary due to stacking contexts */
         }
       `}</style>
+
       <Footer />
     </div>
   );
