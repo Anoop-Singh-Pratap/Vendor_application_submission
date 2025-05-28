@@ -214,7 +214,7 @@ const formatPhoneNumber = (phoneNumber: string, countryCode: string): string => 
     if (prefixMatch) {
       const prefix = prefixMatch[0];
       const numberPart = cleaned.substring(prefix.length).replace(/\D/g, ''); // Get remaining digits
-
+      
       let spacedNumber = prefix;
       if (numberPart.length > 0) {
         spacedNumber += ' ' + numberPart;
@@ -227,7 +227,7 @@ const formatPhoneNumber = (phoneNumber: string, countryCode: string): string => 
       return spacedNumber.trim();
     }
   }
-
+  
   // Fallback if no clear prefix logic was hit, just return cleaned or an empty string if it's just "+"
   return cleaned === '+' ? '' : cleaned;
 };
@@ -330,7 +330,6 @@ const VendorRegistration: React.FC = () => {
   const [isDragging, setIsDragging] = useState(false);
   const [customCountry, setCustomCountry] = useState('');
   const [customCountryCode, setCustomCountryCode] = useState(''); // Should store with '+' e.g. "+123"
-  const [countrySearchQuery, setCountrySearchQuery] = useState('');
 
   // Form setup
   const { register, handleSubmit, control, formState: { errors, isSubmitting }, reset, watch, setValue, trigger } = useForm<VendorFormData>({
@@ -556,7 +555,7 @@ const VendorRegistration: React.FC = () => {
           }
         }
       });
-
+      
       setUploadProgress(80);
       const responseData = response.data;
 
@@ -570,7 +569,6 @@ const VendorRegistration: React.FC = () => {
             clearAllFiles();
             setCustomCountry(''); // Reset custom country state
             setCustomCountryCode('');
-            setCountrySearchQuery(''); // Reset country search
             // Explicitly reset vendorType and country to defaults if needed after reset()
             setValue('vendorType', 'domestic', { shouldValidate: true });
             setValue('country', 'in', { shouldValidate: true });
@@ -628,7 +626,7 @@ const VendorRegistration: React.FC = () => {
   // Derived values for UI display (country code badge, placeholder)
   const isOtherCountrySelected = watchedCountry === 'others';
   const isDomestic = watchedVendorType === 'domestic';
-
+  
   const activeDialCode = useMemo(() => {
     if (isDomestic) return '+91';
     if (isOtherCountrySelected) return customCountryCode; // customCountryCode includes '+'
@@ -638,23 +636,11 @@ const VendorRegistration: React.FC = () => {
 
   const contactPlaceholder = useMemo(() => {
     if (isDomestic) return 'XXXXXXXXXX (10 digits)';
-    if (activeDialCode) return 'Your Number'; // Removed country code from placeholder since it's shown in badge
+    if (activeDialCode) return `${activeDialCode} Your Number`;
     return '+__ Your Number';
   }, [isDomestic, activeDialCode]);
 
   const shouldShowCountryCodeBadge = !isDomestic && !!activeDialCode;
-
-  // Filter countries based on search query
-  const filteredCountries = useMemo(() => {
-    if (!countrySearchQuery.trim()) {
-      return countries;
-    }
-    const query = countrySearchQuery.toLowerCase().trim();
-    return countries.filter(country =>
-      country.name.toLowerCase().includes(query) ||
-      country.countryCode.includes(query)
-    );
-  }, [countrySearchQuery]);
 
 
   // Cleanup object URLs on unmount
@@ -680,7 +666,7 @@ const VendorRegistration: React.FC = () => {
   useEffect(() => {
     const currentVendorType = watchedVendorType;
     const currentCountry = watchedCountry;
-
+    
     let newTargetCountryForField = currentCountry; // what country field should be
     let newTargetPhonePrefix = ""; // what phone prefix should be
 
@@ -696,7 +682,7 @@ const VendorRegistration: React.FC = () => {
                 newTargetCountryForField = 'us'; // Default to US
                 newTargetPhonePrefix = usCountryData.countryCode;
             } else { // Fallback if US not found (should not happen with current data)
-                newTargetCountryForField = '';
+                newTargetCountryForField = ''; 
                 newTargetPhonePrefix = '';
             }
         } else if (currentCountry === 'others') {
@@ -709,7 +695,7 @@ const VendorRegistration: React.FC = () => {
              newTargetPhonePrefix = ''; // No country selected for global
         }
     }
-
+    
     // Update country form field if it needs to change
     if (watch('country') !== newTargetCountryForField && newTargetCountryForField) {
         setValue('country', newTargetCountryForField, { shouldValidate: true, shouldDirty: (watch('country') !== newTargetCountryForField) });
@@ -1170,7 +1156,6 @@ const VendorRegistration: React.FC = () => {
                                           setCustomCountry('');
                                           setCustomCountryCode('');
                                         }
-                                        setCountrySearchQuery(''); // Clear search when country is selected
                                         trigger("contactNo"); // Re-validate phone when country changes
                                       }}
                                       defaultValue={field.value}
@@ -1197,15 +1182,9 @@ const VendorRegistration: React.FC = () => {
                                       </SelectTrigger>
                                       <SelectContent className="max-h-80">
                                           <div className="p-2 sticky top-0 bg-background z-10 border-b">
-                                              <Input
-                                                placeholder="Search countries..."
-                                                value={countrySearchQuery}
-                                                onChange={(e) => setCountrySearchQuery(e.target.value)}
-                                                className="h-8 text-sm"
-                                                autoFocus={false}
-                                              />
+                                              {/* Search input for countries (client-side filter example) */}
                                           </div>
-                                        {filteredCountries.map(country => (
+                                        {countries.map(country => (
                                           <SelectItem
                                             key={country.code}
                                             value={country.code}
@@ -1213,14 +1192,13 @@ const VendorRegistration: React.FC = () => {
                                             data-country-name={country.name}
                                             className="cursor-pointer"
                                           >
-                                            <span>{country.name}</span>
+                                            {/* ... (country item display logic from original) ... */}
+                                            <div className="flex items-center justify-between">
+                                              <span>{country.name}</span>
+                                              {country.code !== 'others' && <span className="text-xs text-muted-foreground">{country.countryCode}</span>}
+                                            </div>
                                           </SelectItem>
                                         ))}
-                                        {filteredCountries.length === 0 && countrySearchQuery.trim() && (
-                                          <div className="p-3 text-center text-sm text-muted-foreground">
-                                            No countries found matching "{countrySearchQuery}"
-                                          </div>
-                                        )}
                                       </SelectContent>
                                     </Select>
                                     {watchedVendorType === 'domestic' && (
@@ -1424,7 +1402,7 @@ const VendorRegistration: React.FC = () => {
                                     inputMode="decimal"
                                     placeholder="Enter turnover value"
                                     className="bg-background/70"
-                                    {...register("turnover", {
+                                    {...register("turnover", { 
                                         required: "Turnover value is required",
                                         valueAsNumber: true,
                                         min: { value: 0, message: "Turnover must be positive" }
@@ -1769,7 +1747,7 @@ const VendorRegistration: React.FC = () => {
       <style>{`
         /* Font imports (ensure these are loaded, e.g., in public/index.html or via a global CSS file) */
         /* @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400..700&family=Lexend:wght@100..900&display=swap'); */
-
+        
         :root {
           --font-display: 'Lexend', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
           --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
@@ -1844,7 +1822,7 @@ const VendorRegistration: React.FC = () => {
         ::-webkit-scrollbar-thumb:hover {
           background-color: hsl(var(--border)); /* Use theme variable */
         }
-
+        
         /* Ensure SelectContent from Radix/Shadcn is above other elements */
         [data-radix-popper-content-wrapper] { /* More specific selector for Radix popper */
             z-index: 9999 !important; /* Ensure it's on top, use !important if necessary due to stacking contexts */
