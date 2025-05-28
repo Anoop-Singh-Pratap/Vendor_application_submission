@@ -634,13 +634,15 @@ const VendorRegistration: React.FC = () => {
     return countryData?.countryCode || '';
   }, [isDomestic, isOtherCountrySelected, watchedCountry, customCountryCode]);
 
+  const shouldShowCountryCodeBadge = !isDomestic && !!activeDialCode;
+
+  // Modified: Contact placeholder should NOT include country code when badge is shown
   const contactPlaceholder = useMemo(() => {
     if (isDomestic) return 'XXXXXXXXXX (10 digits)';
+    if (shouldShowCountryCodeBadge) return 'Your Number'; // Don't repeat country code when badge is visible
     if (activeDialCode) return `${activeDialCode} Your Number`;
     return '+__ Your Number';
-  }, [isDomestic, activeDialCode]);
-
-  const shouldShowCountryCodeBadge = !isDomestic && !!activeDialCode;
+  }, [isDomestic, shouldShowCountryCodeBadge, activeDialCode]);
 
 
   // Cleanup object URLs on unmount
@@ -657,9 +659,19 @@ const VendorRegistration: React.FC = () => {
   // Handle phone number input change with formatting
   const handlePhoneChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value;
-    const formattedPhone = formatPhoneNumber(inputValue, activeDialCode);
-    setValue('contactNo', formattedPhone, { shouldValidate: true });
-  }, [activeDialCode, setValue]);
+    
+    // Only add country code if badge is not showing
+    if (shouldShowCountryCodeBadge) {
+      // If badge is showing, we don't want to prefix with country code again
+      // Just format the number without adding the prefix
+      const cleanedValue = inputValue.replace(/^\+\d+\s*/, '').trim();
+      setValue('contactNo', cleanedValue, { shouldValidate: true });
+    } else {
+      // Normal formatting with country code
+      const formattedPhone = formatPhoneNumber(inputValue, activeDialCode);
+      setValue('contactNo', formattedPhone, { shouldValidate: true });
+    }
+  }, [activeDialCode, setValue, shouldShowCountryCodeBadge]);
 
 
   // Effect to manage country field and contact number prefix based on context changes
@@ -1181,9 +1193,25 @@ const VendorRegistration: React.FC = () => {
                                         </div>
                                       </SelectTrigger>
                                       <SelectContent className="max-h-80">
-                                          <div className="p-2 sticky top-0 bg-background z-10 border-b">
-                                              {/* Search input for countries (client-side filter example) */}
-                                          </div>
+                                        <div className="p-2 sticky top-0 bg-background z-10 border-b">
+                                          <Input 
+                                            placeholder="Search countries..."
+                                            className="h-8 text-sm"
+                                            onChange={(e) => {
+                                              const searchTerm = e.target.value.toLowerCase();
+                                              document.querySelectorAll('[data-country-item]').forEach((item: Element) => {
+                                                const countryItem = item as HTMLElement;
+                                                const countryName = countryItem.getAttribute('data-country-name')?.toLowerCase() || '';
+                                                
+                                                if (countryName.includes(searchTerm)) {
+                                                  countryItem.style.display = 'block';
+                                                } else {
+                                                  countryItem.style.display = 'none';
+                                                }
+                                              });
+                                            }}
+                                          />
+                                        </div>
                                         {countries.map(country => (
                                           <SelectItem
                                             key={country.code}
@@ -1192,7 +1220,6 @@ const VendorRegistration: React.FC = () => {
                                             data-country-name={country.name}
                                             className="cursor-pointer"
                                           >
-                                            {/* ... (country item display logic from original) ... */}
                                             <div className="flex items-center justify-between">
                                               <span>{country.name}</span>
                                               {country.code !== 'others' && <span className="text-xs text-muted-foreground">{country.countryCode}</span>}
@@ -1294,22 +1321,30 @@ const VendorRegistration: React.FC = () => {
                                   )}
                                   {...register("contactNo", {
                                     required: "Contact number is required",
-                                    onChange: handlePhoneChange, // Use the memoized handler
+                                    onChange: handlePhoneChange, // Use the modified handler
                                     validate: (value) => {
-                                        // Re-calculate activeDialCode for validation context as it might not be updated yet if this runs before useEffect
-                                        const currentType = watch('vendorType');
-                                        const currentCountryVal = watch('country');
-                                        let validatingDialCode = '';
-                                        if (currentType === 'domestic') {
-                                            validatingDialCode = '+91';
-                                        } else if (currentCountryVal === 'others') {
-                                            validatingDialCode = customCountryCode;
-                                        } else {
-                                            const countryData = countries.find(c => c.code === currentCountryVal);
-                                            validatingDialCode = countryData?.countryCode || '';
-                                        }
-                                        return validatePhoneNumber(value, validatingDialCode) ||
-                                        `Invalid phone number for ${countries.find(c=>c.countryCode === validatingDialCode)?.name || 'selected region'}.`;
+                                      // Re-calculate activeDialCode for validation context as it might not be updated yet if this runs before useEffect
+                                      const currentType = watch('vendorType');
+                                      const currentCountryVal = watch('country');
+                                      let validatingDialCode = '';
+                                      if (currentType === 'domestic') {
+                                          validatingDialCode = '+91';
+                                      } else if (currentCountryVal === 'others') {
+                                          validatingDialCode = customCountryCode;
+                                      } else {
+                                          const countryData = countries.find(c => c.code === currentCountryVal);
+                                          validatingDialCode = countryData?.countryCode || '';
+                                      }
+                                      
+                                      // For validation, we need to prepend the country code if it's not already there
+                                      // and the badge is showing (since the actual input won't have it)
+                                      let valueToValidate = value;
+                                      if (shouldShowCountryCodeBadge && !value.startsWith(validatingDialCode)) {
+                                          valueToValidate = `${validatingDialCode} ${value}`.trim();
+                                      }
+                                      
+                                      return validatePhoneNumber(valueToValidate, validatingDialCode) ||
+                                      `Invalid phone number for ${countries.find(c=>c.countryCode === validatingDialCode)?.name || 'selected region'}.`;
                                     }
                                   })}
                                   aria-invalid={errors.contactNo ? "true" : "false"}
@@ -1319,7 +1354,9 @@ const VendorRegistration: React.FC = () => {
                                 <p className="text-xs text-muted-foreground mt-1">
                                   {isDomestic
                                     ? 'Enter a 10-digit mobile number.'
-                                    : 'Include country code if not already shown.'}
+                                    : shouldShowCountryCodeBadge 
+                                      ? 'Enter your number without the country code.' 
+                                      : 'Include country code if not already shown.'}
                                 </p>
                               )}
                             </FormField>
