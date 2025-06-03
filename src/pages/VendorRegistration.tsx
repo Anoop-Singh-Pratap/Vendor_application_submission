@@ -82,11 +82,7 @@ const categories = [
   { id: 'amc-mechanical', label: 'AMC-Mechanical' },
   { id: 'amc-others', label: 'AMC-others (IT, rent, HR related, Mrk related etc)' },
   { id: 'material-handling-rental', label: 'Material Handling equip Rental' },
-  { id: 'logistics', label: 'Logistics (sea, CHAs)' },
-  { id: 'logistics-road', label: 'Logistics - Road' },
-  { id: 'logistics-sea', label: 'Logistics - Sea' },
-  { id: 'service-man-power-supply', label: 'Service - Man Power Supply' },
-  { id: 'other', label: 'Other' },
+  { id: 'logistics', label: 'Logistics (sea, CHAs)' }
 ];
 
 // Countries data for the dropdown
