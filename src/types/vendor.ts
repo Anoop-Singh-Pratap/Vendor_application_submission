@@ -15,6 +15,7 @@ export interface VendorFormData {
   majorClients?: string;
   turnover: string;
   turnoverCurrency: string; // 'INR' or 'USD'
+  gstNumber?: string; // GST Registration Number (optional)
   terms: boolean;
   referenceId?: string; // Added for tracking
 }
