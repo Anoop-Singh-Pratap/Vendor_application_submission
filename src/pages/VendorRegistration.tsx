@@ -1431,7 +1431,7 @@ const VendorRegistration: React.FC = () => {
                                     {...register("turnover", { 
                                         required: "Turnover value is required",
                                         valueAsNumber: true,
-                                        min: { value: 0, message: "Turnover must be positive" }
+                                        min: { value: 0.1, message: "Turnover must be at least 0.1" }
                                     })}
                                     aria-invalid={errors.turnover ? "true" : "false"}
                                   />
