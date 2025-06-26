@@ -2,7 +2,7 @@ import React, { useState, useCallback, useEffect, ChangeEvent, DragEvent, FormEv
 import { motion, AnimatePresence, useAnimation, Variants } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import {
-  Upload, Check, FileText, Building, User, Phone, Mail, Briefcase, CheckCircle, Globe, X, AlertCircle, Loader2, ChevronRight, ArrowRight, TrendingUp, ShieldCheck, Award, Plus
+  Upload, Check, FileText, Building, User, Phone, Mail, Briefcase, CheckCircle, Globe, X, AlertCircle, Loader2, ChevronRight, ArrowRight, TrendingUp, ShieldCheck, Award, Plus, Clock
 } from 'lucide-react';
 import { useForm, SubmitHandler, Controller } from 'react-hook-form';
 // import axios from 'axios'; // Assuming 'api' handles axios instance
@@ -143,7 +143,6 @@ const sortableCountries = [
   { code: "ua", name: "Ukraine", countryCode: "+380" },
   { code: "at", name: "Austria", countryCode: "+43" },
   { code: "pe", name: "Peru", countryCode: "+51" },
-  { code: "cz", name: "Czech Republic", countryCode: "+420" },
   { code: "sk", name: "Slovakia", countryCode: "+421" },
   { code: "si", name: "Slovenia", countryCode: "+386" },
   { code: "hr", name: "Croatia", countryCode: "+385" },
@@ -154,11 +153,6 @@ const sortableCountries = [
   { code: "rs", name: "Serbia", countryCode: "+381" },
   { code: "by", name: "Belarus", countryCode: "+375" },
   { code: "ge", name: "Georgia", countryCode: "+995" },
-  { code: "il", name: "Israel", countryCode: "+972" },
-  { code: "ie", name: "Ireland", countryCode: "+353" },
-  { code: "dk", name: "Denmark", countryCode: "+45" },
-  { code: "no", name: "Norway", countryCode: "+47" },
-  { code: "fi", name: "Finland", countryCode: "+358" },
   { code: "is", name: "Iceland", countryCode: "+354" },
   { code: "lu", name: "Luxembourg", countryCode: "+352" },
   { code: "mt", name: "Malta", countryCode: "+356" },
@@ -331,6 +325,12 @@ const VendorRegistration: React.FC = () => {
   const [customCountry, setCustomCountry] = useState('');
   const [customCountryCode, setCustomCountryCode] = useState(''); // Should store with '+' e.g. "+123"
   const [countrySearchQuery, setCountrySearchQuery] = useState(""); // State for country search
+
+  // --- Security-related state ---
+  const [submitCooldown, setSubmitCooldown] = useState(0);
+  const [lastSubmissionTime, setLastSubmissionTime] = useState<number | null>(null);
+  const [hasRecentSubmission, setHasRecentSubmission] = useState(false);
+  const [securityWarning, setSecurityWarning] = useState<string | null>(null);
 
   // Form setup
   const { register, handleSubmit, control, formState: { errors, isSubmitting }, reset, watch, setValue, trigger } = useForm<VendorFormData>({
@@ -508,10 +508,132 @@ const VendorRegistration: React.FC = () => {
   }, [processFiles]);
 
 
-  // Form submission handler
+  // Security check on component mount
+  useEffect(() => {
+    const checkRecentSubmission = () => {
+      const lastSubmission = localStorage.getItem('lastVendorSubmission');
+      const lastSubmissionEmail = localStorage.getItem('lastSubmissionEmail');
+      
+      if (lastSubmission) {
+        const submissionTime = parseInt(lastSubmission);
+        const now = Date.now();
+        const hoursSinceSubmission = (now - submissionTime) / (1000 * 60 * 60);
+        
+        setLastSubmissionTime(submissionTime);
+        
+        if (hoursSinceSubmission < 24) {
+          setHasRecentSubmission(true);
+          const hoursLeft = Math.ceil(24 - hoursSinceSubmission);
+          setSecurityWarning(
+            `You submitted a vendor registration ${Math.floor(hoursSinceSubmission)} hours ago${lastSubmissionEmail ? ` with email ${lastSubmissionEmail}` : ''}. Please wait ${hoursLeft} hours before submitting again.`
+          );
+        }
+      }
+    };
+
+    checkRecentSubmission();
+  }, []);
+
+  // Enhanced error handling helper
+  const handleSubmissionError = (error: any) => {
+    console.error('Submission error:', error);
+    
+    let errorMessage = 'Submission failed. Please try again.';
+    let isSecurityError = false;
+    
+    if (error.response?.data) {
+      const errorData = error.response.data;
+      
+      switch (errorData.error) {
+        case 'DUPLICATE_EMAIL':
+          errorMessage = errorData.message || 'A submission with this email already exists.';
+          isSecurityError = true;
+          break;
+        case 'DUPLICATE_PHONE_COMPANY':
+          errorMessage = errorData.message || 'A submission with this phone number and company already exists.';
+          isSecurityError = true;
+          break;
+        case 'DUPLICATE_IP_COMPANY':
+          errorMessage = errorData.message || 'A submission for this company from your location already exists.';
+          isSecurityError = true;
+          break;
+        case 'DUPLICATE_FINGERPRINT':
+          errorMessage = errorData.message || 'This exact submission was already processed.';
+          isSecurityError = true;
+          break;
+        case 'IP_BLOCKED':
+        case 'IP_RATE_LIMIT_EXCEEDED':
+          errorMessage = errorData.message || 'Too many submissions from your location. Please try again later.';
+          isSecurityError = true;
+          if (errorData.blockTimeLeft) {
+            errorMessage += ` (${errorData.blockTimeLeft} minutes remaining)`;
+          }
+          break;
+        case 'RATE_LIMIT_EXCEEDED':
+          errorMessage = 'Too many requests. Please wait a moment and try again.';
+          isSecurityError = true;
+          break;
+        case 'VALIDATION_ERROR':
+          errorMessage = 'Please check your form data and try again.';
+          if (errorData.errors?.length > 0) {
+            errorMessage += ' Issues: ' + errorData.errors.map((e: any) => e.msg).join(', ');
+          }
+          break;
+        case 'FILE_SIZE_LIMIT':
+        case 'FILE_SIZE_ERROR':
+          errorMessage = 'One or more files are too large. Maximum size is 10MB per file.';
+          break;
+        case 'FILE_COUNT_LIMIT':
+          errorMessage = 'Too many files. Maximum 3 files allowed.';
+          break;
+        case 'UPLOAD_ERROR':
+          errorMessage = errorData.message || 'File upload failed. Please check your files and try again.';
+          break;
+        default:
+          errorMessage = errorData.message || 'Unexpected error occurred. Please try again.';
+      }
+    } else if (error.code === 'NETWORK_ERROR' || error.message?.includes('Network Error')) {
+      errorMessage = 'Network connection error. Please check your internet connection and try again.';
+    } else if (error.message?.includes('timeout')) {
+      errorMessage = 'Request timed out. Please try again.';
+    }
+    
+    if (isSecurityError) {
+      setSecurityWarning(errorMessage);
+    } else {
+      setFileErrors(prev => [...prev, errorMessage]);
+    }
+  };
+
+  // Form submission handler with enhanced security
   const onSubmit: SubmitHandler<VendorFormData> = async (data) => {
     try {
-      setUploadProgress(10); // Initial progress
+      // Security checks before submission
+      const now = Date.now();
+      
+      // Check for recent submission cooldown
+      if (hasRecentSubmission || securityWarning) {
+        setFileErrors(['Please resolve the security warning before submitting.']);
+        return;
+      }
+      
+      // Check submission cooldown (5 minutes between attempts)
+      if (lastSubmissionTime && (now - lastSubmissionTime) < 5 * 60 * 1000) {
+        const remainingTime = Math.ceil((5 * 60 * 1000 - (now - lastSubmissionTime)) / (60 * 1000));
+        setFileErrors([`Please wait ${remainingTime} minutes before submitting again.`]);
+        return;
+      }
+
+      // Check if already submitting
+      if (isSubmitting) {
+        return;
+      }
+
+      // Clear previous errors
+      setFileErrors([]);
+      setSecurityWarning(null);
+      
+      setUploadProgress(10);
 
       const formData = new FormData();
       Object.entries(data).forEach(([key, value]) => {
@@ -523,36 +645,31 @@ const VendorRegistration: React.FC = () => {
       });
 
       if (data.country === 'others' && customCountry) {
-        formData.append('customCountryName', customCountry); // Use a distinct name
+        formData.append('customCountryName', customCountry);
       }
-      // customCountryCode is part of contactNo logic, might not need separate submission if contactNo is correctly formatted
-      // However, if backend needs it explicitly for 'others':
       if (data.country === 'others' && customCountryCode) {
         formData.append('customCountryDialCode', customCountryCode);
       }
 
-
       files.forEach((file) => {
-        formData.append('supportingDocuments', file); // Consistent field name
+        formData.append('supportingDocuments', file);
       });
 
       setUploadProgress(20);
 
-      // Debug log (optional)
-      // console.log('Form Data Contents:');
-      // for (let [key, value] of formData.entries()) {
-      //   console.log(`${key}: ${value instanceof File ? `File: ${value.name} (${value.size} bytes)` : value}`);
-      // }
-
+      // Enhanced API call with security headers
       const response = await api.post('/vendors', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
+          'X-Timestamp': now.toString(),
+          'X-User-Agent': navigator.userAgent,
         },
+        timeout: 30000, // 30 second timeout
         onUploadProgress: (progressEvent) => {
-          const total = progressEvent.total || files.reduce((acc, f) => acc + f.size, 0); // Estimate total if not available
+          const total = progressEvent.total || files.reduce((acc, f) => acc + f.size, 0);
           if (total) {
             const percentCompleted = Math.round((progressEvent.loaded * 100) / total);
-            setUploadProgress(20 + (percentCompleted * 0.6)); // Scale to 20-80%
+            setUploadProgress(20 + (percentCompleted * 0.6));
           }
         }
       });
@@ -562,15 +679,21 @@ const VendorRegistration: React.FC = () => {
 
       if (responseData.success) {
         setUploadProgress(100);
+        
+        // Store successful submission data
+        localStorage.setItem('lastVendorSubmission', now.toString());
+        localStorage.setItem('lastSubmissionEmail', data.email.toLowerCase());
+        localStorage.setItem('lastSubmissionCompany', data.companyName.toLowerCase());
+        setLastSubmissionTime(now);
+        
         await new Promise<void>((resolve) => {
           window.scrollTo({ top: 0, behavior: 'smooth' });
           setTimeout(() => {
             setIsSubmitted(true);
-            reset(); // Reset form fields to defaultValues
+            reset();
             clearAllFiles();
-            setCustomCountry(''); // Reset custom country state
+            setCustomCountry('');
             setCustomCountryCode('');
-            // Explicitly reset vendorType and country to defaults if needed after reset()
             setValue('vendorType', 'domestic', { shouldValidate: true });
             setValue('country', 'in', { shouldValidate: true });
             setValue('contactNo', '+91 ', { shouldValidate: true });
@@ -581,18 +704,12 @@ const VendorRegistration: React.FC = () => {
         throw new Error(responseData.message || 'Failed to submit vendor registration');
       }
     } catch (error) {
-      console.error('Error submitting form:', error);
-      setFileErrors(prev => [...prev,
-        error instanceof Error
-          ? `Submission failed: ${error.message}`
-          : 'Submission failed. Please check your connection and try again.'
-      ]);
-      setUploadProgress(0); // Reset progress on error
+      handleSubmissionError(error);
+      setUploadProgress(0);
     } finally {
-      // Keep progress at 100 for a bit on success, then reset
-      if (isSubmitted) { // This check might be tricky due to async nature
+      if (isSubmitted) {
         setTimeout(() => setUploadProgress(0), 2000);
-      } else if (uploadProgress !== 100) { // if not success, reset sooner
+      } else if (uploadProgress !== 100) {
         setTimeout(() => setUploadProgress(0), 1000);
       }
     }
@@ -1608,6 +1725,40 @@ const VendorRegistration: React.FC = () => {
                           )}
                         </div>
 
+                        {/* Security Warning Display */}
+                        {securityWarning && (
+                          <div className="pt-4">
+                            <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/60 rounded-xl px-4 py-3 shadow-sm">
+                              <div className="flex items-start gap-3">
+                                <div className="shrink-0 mt-0.5">
+                                  <AlertCircle className="h-5 w-5 text-amber-600 dark:text-amber-500" />
+                                </div>
+                                <div className="flex-1">
+                                  <h4 className="font-medium text-amber-800 dark:text-amber-400 mb-1">Security Notice</h4>
+                                  <p className="text-amber-700/90 dark:text-amber-300/90 text-sm leading-relaxed">
+                                    {securityWarning}
+                                  </p>
+                                </div>
+                                <Button
+                                  type="button"
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => {
+                                    setSecurityWarning(null);
+                                    setHasRecentSubmission(false);
+                                    localStorage.removeItem('lastVendorSubmission');
+                                    localStorage.removeItem('lastSubmissionEmail');
+                                    localStorage.removeItem('lastSubmissionCompany');
+                                  }}
+                                  className="text-amber-600 hover:text-amber-800 dark:text-amber-500 dark:hover:text-amber-300"
+                                >
+                                  <X className="h-4 w-4" />
+                                </Button>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
                         {/* Terms and Submit */}
                         <div className="pt-6 space-y-8">
                           <div className="flex items-start space-x-3 rounded-lg border border-border/50 p-4 bg-muted/20">
@@ -1639,13 +1790,34 @@ const VendorRegistration: React.FC = () => {
 
                           <Button
                             type="submit"
-                            className="w-full bg-gradient-to-r from-rashmi-red to-red-700 hover:from-rashmi-red/90 hover:to-red-700/90 text-white py-6 text-lg font-semibold rounded-xl shadow-md hover:shadow-lg transition-all duration-300"
-                            disabled={isSubmitting || Object.keys(errors).length > 0 && !errors.terms /* Disable if other errors exist besides terms before interaction */}
+                            className={cn(
+                              "w-full py-6 text-lg font-semibold rounded-xl shadow-md hover:shadow-lg transition-all duration-300",
+                              hasRecentSubmission || securityWarning
+                                ? "bg-gray-400 hover:bg-gray-400 cursor-not-allowed text-gray-200"
+                                : "bg-gradient-to-r from-rashmi-red to-red-700 hover:from-rashmi-red/90 hover:to-red-700/90 text-white"
+                            )}
+                            disabled={
+                              isSubmitting || 
+                              hasRecentSubmission || 
+                              securityWarning !== null ||
+                              (lastSubmissionTime && (Date.now() - lastSubmissionTime) < 5 * 60 * 1000) ||
+                              (Object.keys(errors).length > 0 && !errors.terms)
+                            }
                           >
                             {isSubmitting ? (
                               <span className="flex items-center justify-center">
                                 <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                                 Processing Submission...
+                              </span>
+                            ) : hasRecentSubmission || securityWarning ? (
+                              <span className="flex items-center justify-center">
+                                <AlertCircle className="mr-2 h-5 w-5" />
+                                Submission Blocked
+                              </span>
+                            ) : lastSubmissionTime && (Date.now() - lastSubmissionTime) < 5 * 60 * 1000 ? (
+                              <span className="flex items-center justify-center">
+                                <Clock className="mr-2 h-5 w-5" />
+                                Cooldown Active ({Math.ceil((5 * 60 * 1000 - (Date.now() - lastSubmissionTime)) / (60 * 1000))}m)
                               </span>
                             ) : (
                               <span className="flex items-center justify-center">
