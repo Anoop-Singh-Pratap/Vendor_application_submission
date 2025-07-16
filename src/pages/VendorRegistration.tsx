@@ -536,13 +536,46 @@ const VendorRegistration: React.FC = () => {
 
   // Enhanced error handling helper
   const handleSubmissionError = (error: any) => {
-    console.error('Submission error:', error);
+    console.error('=== SUBMISSION ERROR DEBUG ===');
+    console.error('Full error object:', error);
+    console.error('Error message:', error.message);
+    console.error('Error code:', error.code);
+    console.error('Error name:', error.name);
+    
+    // Log response details if available
+    if (error.response) {
+      console.error('Response status:', error.response.status);
+      console.error('Response statusText:', error.response.statusText);
+      console.error('Response data:', error.response.data);
+      console.error('Response headers:', error.response.headers);
+    }
+    
+    // Log request details if available
+    if (error.request) {
+      console.error('Request details:', error.request);
+    }
+    
+    // Log config if available
+    if (error.config) {
+      console.error('Request config:', {
+        url: error.config.url,
+        method: error.config.method,
+        timeout: error.config.timeout,
+        headers: error.config.headers
+      });
+    }
     
     let errorMessage = 'Submission failed. Please try again.';
     let isSecurityError = false;
     
     if (error.response?.data) {
       const errorData = error.response.data;
+      console.error('Backend error data:', errorData);
+      
+      // Log email sending status specifically
+      if (errorData.emailSent !== undefined) {
+        console.error('Email sent status:', errorData.emailSent);
+      }
       
       switch (errorData.error) {
         case 'DUPLICATE_EMAIL':
@@ -593,10 +626,19 @@ const VendorRegistration: React.FC = () => {
           errorMessage = errorData.message || 'Unexpected error occurred. Please try again.';
       }
     } else if (error.code === 'NETWORK_ERROR' || error.message?.includes('Network Error')) {
+      console.error('Network error detected');
       errorMessage = 'Network connection error. Please check your internet connection and try again.';
     } else if (error.message?.includes('timeout')) {
+      console.error('Timeout error detected');
       errorMessage = 'Request timed out. Please try again.';
+    } else if (error.code === 'ECONNABORTED') {
+      console.error('Connection aborted - likely timeout');
+      errorMessage = 'Connection timed out. Please try again.';
     }
+    
+    console.error('Final error message for user:', errorMessage);
+    console.error('Is security error:', isSecurityError);
+    console.error('=== END SUBMISSION ERROR DEBUG ===');
     
     if (isSecurityError) {
       setSecurityWarning(errorMessage);
@@ -676,6 +718,16 @@ const VendorRegistration: React.FC = () => {
       
       setUploadProgress(80);
       const responseData = response.data;
+
+      // Log successful response details
+      console.log('=== SUCCESSFUL SUBMISSION ===');
+      console.log('Response status:', response.status);
+      console.log('Response data:', responseData);
+      console.log('Email sent status:', responseData.emailSent);
+      console.log('Reference ID:', responseData.referenceId);
+      console.log('Submission ID:', responseData.submissionId);
+      console.log('Timestamp:', responseData.timestamp);
+      console.log('=== END SUCCESSFUL SUBMISSION ===');
 
       if (responseData.success) {
         setUploadProgress(100);
