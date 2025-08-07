@@ -1160,18 +1160,11 @@ const VendorRegistration: React.FC = () => {
                         playsInline
                         className="w-full h-full object-cover"
                         aria-label="Business partnership and vendor registration process visualization"
-                        poster="https://res.cloudinary.com/dada5hjp3/image/upload/v1744700600/vendor-registration-poster.jpg"
                         preload="metadata"
                       >
                         <source
-                          src="https://res.cloudinary.com/dada5hjp3/video/upload/v1744700600/0_Business_Agreement_1080x1920_tzq7hk.mp4"
+                          src="/Vendor-video.mp4"
                           type="video/mp4"
-                        />
-                        <track
-                          kind="descriptions"
-                          srcLang="en" // Added srcLang
-                          src="/lovable-uploads/captions/vendor-registration-desc.vtt" // Ensure this path is correct
-                          label="English descriptions"
                         />
                         Your browser does not support the video tag.
                       </video>
