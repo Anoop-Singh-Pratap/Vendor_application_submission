@@ -2,7 +2,9 @@ import React, { useState, useCallback, useEffect, ChangeEvent, DragEvent, FormEv
 import { motion, AnimatePresence, useAnimation, Variants } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import {
-  Upload, Check, FileText, Building, User, Phone, Mail, Briefcase, CheckCircle, Globe, X, AlertCircle, Loader2, ChevronRight, ArrowRight, TrendingUp, ShieldCheck, Award, Plus, Clock
+  Upload, Check, FileText, Building, User, Phone, Mail, Briefcase, CheckCircle, Globe, X, AlertCircle, Loader2, ChevronRight, ArrowRight, TrendingUp, ShieldCheck, Award, Plus, Clock,
+  Factory, Store, Users, Wrench, Lightbulb, Truck, Zap, Hammer, Palette, Mountain, Fuel, Package, Ship, Train, Move, Beaker, HardDrive, Flame, 
+  Shield, Settings, Cog, Cpu, Anchor, HardHat, PersonStanding, Monitor
 } from 'lucide-react';
 import { useForm, SubmitHandler, Controller } from 'react-hook-form';
 // import axios from 'axios'; // Assuming 'api' handles axios instance
@@ -44,50 +46,50 @@ interface VendorFormData {
 }
 
 const firmTypes = [
-  { id: 'manufacturer', label: 'Manufacturer/OEM' },
-  { id: 'dealer', label: 'Dealer/ Trader' },
-  { id: 'oem-distributor', label: 'OEM Authorized Distributor' },
-  { id: 'service', label: 'Service Company' },
-  { id: 'consultant', label: 'Consultant/ Agency' },
-  { id: 'contractor', label: 'Contractor' },
-  { id: 'transport', label: 'Transport/ Logistc' },
+  { id: 'manufacturer', label: 'Manufacturer/OEM', icon: Factory },
+  { id: 'dealer', label: 'Dealer/ Trader', icon: Store },
+  { id: 'oem-distributor', label: 'OEM Authorized Distributor', icon: Award },
+  { id: 'service', label: 'Service Company', icon: Wrench },
+  { id: 'consultant', label: 'Consultant/ Agency', icon: Lightbulb },
+  { id: 'contractor', label: 'Contractor', icon: HardHat },
+  { id: 'transport', label: 'Transport/ Logistc', icon: Truck },
 ];
 
 const categories = [
-  { id: 'pure-magnesium', label: 'Pure Magnesium Ingot, Zinc Wire, Unexpended Pearlite Ore' },
-  { id: 'metallic-mould', label: 'Metallic Mould,Ferro Sillica Lump' },
-  { id: 'inopipe-zircobar', label: 'Inopipe, Zircobar, Sillica Sand,Ceramic Fibre Blanket' },
-  { id: 'tools-tackles', label: 'Tools, Tackles' },
-  { id: 'industrial-paints', label: 'Industrial Paints(Black Bituminous, Thinners, Epoxy Paint, Road marking paint, Zinc Rich Paint)' },
-  { id: 'flux', label: 'Flux (Limestone, Quartizite, Mn Ore, Dolomite)' },
-  { id: 'bulk-material-coke', label: 'Bulk Material(Coke Fines, PCI Coal)' },
-  { id: 'bulk-material-iron', label: 'Bulk Material(Iron Ore, Iron Fines & Lumps, Pellets)' },
-  { id: 'cardboard-sponge', label: 'Cardboard, Sponge/ Foam, Heat Resistant Chalk' },
-  { id: 'service-contracts', label: 'Service Contracts( AMC Civil, AMC Mechanical, AMC Electrical, AMC HR, IT & Marketing etc)' },
-  { id: 'general-purchase', label: 'General Purchase(Admin, Stationary, Cloth & Texttile, Travel, Security etc)' },
-  { id: 'packing-materials', label: 'Packing materials( Wood Plank, Water Hose Pipe, Steel Strap,Cardboad Box)' },
-  { id: 'logistics-service', label: 'Logistics Sevice(Road, Sea, Air,CHA etc)' },
-  { id: 'transporter', label: 'Transporter(Road, Rail)' },
-  { id: 'material-handling', label: 'Material Handling equipment rentals, & Lifting Equipment' },
-  { id: 'gases-chemicals', label: 'Gases/ Chemicals/ Petrol & Oil/ Lubricants' },
-  { id: 'foundary-resins', label: 'Foundary Resins(Resin, Hardner, Catalyst, Cleaning Agent)' },
-  { id: 'it-hardware', label: 'IT HARDWARE AND SOFTWARE (server , Rental laptop and Printer , hardware parts , software)' },
-  { id: 'refractory', label: 'Refractory( Basic, MCB, Castable & Other Bricks), Castables(Whythteat A & K, Ramming Mass), Foundary Resins(Resin, Hardner, Catalyst, Cleaning Agent)' },
-  { id: 'rubber-pvc', label: 'Rubber, PVC, Conveyor Belts, V Belts, Tyre, Rolls & Roll Chocks' },
-  { id: 'fire-fighting', label: 'Plant Fire Fighting equipment and Service' },
-  { id: 'safety-items', label: 'Plant Safety Item(shoes , helmet , Gloves, Harness etc)' },
-  { id: 'pipe-fitting', label: 'Pipe, Fitting, Building, Materials & Sanitary' },
-  { id: 'electrical-spares', label: 'ELECTRICAL Spare and Consumables' },
-  { id: 'mechanical-spares', label: 'MRO  MECHANICAL Spare and Consumables' },
-  { id: 'hydraulics-pneumatics', label: 'HYDRAYLICS- PNEUMATIS Spare and Consumables' },
-  { id: 'material-handling-spares', label: 'Material Handling equipment Spare and Consumables(AUTOMOBILE)' },
-  { id: 'mro', label: 'MRO(Bearing, Cutting Tools, Electrical Spares, FastEners, Nut & Bolts, Pump, Motors & Motors Spares, Rolls & Roll Chocks)' },
-  { id: 'instrumentation', label: 'Instrumentation & Electronics Items, Electrical Equipment & Electreical Consumable' },
-  { id: 'fluxes-electrodes', label: 'Fluxes & Electrodes, Mould Welding Wire, Welding Flux & OTHER  Welding Equipments' },
-  { id: 'cable-winding', label: 'Cable, Cabling Accessories & Winding Wires' },
-  { id: 'drawing-based', label: 'Drawing based item - Casting  ,fabrication &  Machining and Assembly' },
-  { id: 'manpower-contractor', label: 'Manpower Contractor' },
-  { id: 'any-other', label: 'Any Other' }
+  { id: 'pure-magnesium', label: 'Pure Magnesium Ingot, Zinc Wire, Unexpanded Perlite Ore', icon: Zap },
+  { id: 'metallic-mould', label: 'Metallic Mould, Ferro Silica Lump', icon: Factory },
+  { id: 'inopipe-zircobar', label: 'Inopipe, Zircobar, Silica Sand, Ceramic Fibre Blanket', icon: Settings },
+  { id: 'tools-tackles', label: 'Tools, Tackles', icon: Hammer },
+  { id: 'industrial-paints', label: 'Industrial Paints(Black Bituminous, Thinners, Epoxy Paint, Road marking paint, Zinc Rich Paint)', icon: Palette },
+  { id: 'flux', label: 'Flux (Limestone, Quartzite, Mn Ore, Dolomite)', icon: Mountain },
+  { id: 'bulk-material-coke', label: 'Bulk Material(Coke Fines, PCI Coal)', icon: Fuel },
+  { id: 'bulk-material-iron', label: 'Bulk Material(Iron Ore, Iron Fines & Lumps, Pellets)', icon: Package },
+  { id: 'cardboard-sponge', label: 'Cardboard, Sponge/ Foam, Heat Resistant Chalk', icon: Package },
+  { id: 'service-contracts', label: 'Service Contracts( AMC Civil, AMC Mechanical, AMC Electrical, AMC HR, IT & Marketing etc)', icon: FileText },
+  { id: 'general-purchase', label: 'General Purchase(Admin, Stationery, Cloth & Textile, Travel, Security etc)', icon: Building },
+  { id: 'packing-materials', label: 'Packing materials( Wood Plank, Water Hose Pipe, Steel Strap, Cardboard Box)', icon: Package },
+  { id: 'logistics-service', label: 'Logistics Service(Road, Sea, Air, CHA etc)', icon: Ship },
+  { id: 'transporter', label: 'Transporter(Road, Rail)', icon: Train },
+  { id: 'material-handling', label: 'Material Handling equipment rentals, & Lifting Equipment', icon: Move },
+  { id: 'gases-chemicals', label: 'Gases/ Chemicals/ Petrol & Oil/ Lubricants', icon: Beaker },
+  { id: 'foundry-resins', label: 'Foundry Resins(Resin, Hardener, Catalyst, Cleaning Agent)', icon: Beaker },
+  { id: 'it-hardware', label: 'IT HARDWARE AND SOFTWARE (server , Rental laptop and Printer , hardware parts , software)', icon: HardDrive },
+  { id: 'refractory', label: 'Refractory( Basic, MCB, Castable & Other Bricks), Castables(Whytheat A & K, Ramming Mass), Foundry Resins(Resin, Hardener, Catalyst, Cleaning Agent)', icon: Flame },
+  { id: 'rubber-pvc', label: 'Rubber, PVC, Conveyor Belts, V Belts, Tyre, Rolls & Roll Chocks', icon: Settings },
+  { id: 'fire-fighting', label: 'Plant Fire Fighting equipment and Service', icon: Shield },
+  { id: 'safety-items', label: 'Plant Safety Item(shoes , helmet , Gloves, Harness etc)', icon: HardHat },
+  { id: 'pipe-fitting', label: 'Pipe, Fitting, Building, Materials & Sanitary', icon: Settings },
+  { id: 'electrical-spares', label: 'ELECTRICAL Spare and Consumables', icon: Zap },
+  { id: 'mechanical-spares', label: 'MRO  MECHANICAL Spare and Consumables', icon: Cog },
+  { id: 'hydraulics-pneumatics', label: 'HYDRAULICS- PNEUMATICS Spare and Consumables', icon: Settings },
+  { id: 'material-handling-spares', label: 'Material Handling equipment Spare and Consumables(AUTOMOBILE)', icon: Truck },
+  { id: 'mro', label: 'MRO(Bearing, Cutting Tools, Electrical Spares, Fasteners, Nut & Bolts, Pump, Motors & Motors Spares, Rolls & Roll Chocks)', icon: Wrench },
+  { id: 'instrumentation', label: 'Instrumentation & Electronics Items, Electrical Equipment & Electrical Consumable', icon: Cpu },
+  { id: 'fluxes-electrodes', label: 'Fluxes & Electrodes, Mould Welding Wire, Welding Flux & OTHER  Welding Equipments', icon: Zap },
+  { id: 'cable-winding', label: 'Cable, Cabling Accessories & Winding Wires', icon: Zap },
+  { id: 'drawing-based', label: 'Drawing based item - Casting, Fabrication & Machining and Assembly', icon: Settings },
+  { id: 'manpower-contractor', label: 'Manpower Contractor', icon: Users },
+  { id: 'any-other', label: 'Any Other', icon: Plus }
 ];
 
 // Countries data for the dropdown
@@ -1260,7 +1262,12 @@ const VendorRegistration: React.FC = () => {
                                     </SelectTrigger>
                                     <SelectContent>
                                       {firmTypes.map(type => (
-                                        <SelectItem key={type.id} value={type.id}>{type.label}</SelectItem>
+                                        <SelectItem key={type.id} value={type.id}>
+                                          <div className="flex items-center gap-2">
+                                            <type.icon className="h-4 w-4 text-muted-foreground" />
+                                            <span>{type.label}</span>
+                                          </div>
+                                        </SelectItem>
                                       ))}
                                     </SelectContent>
                                   </Select>
@@ -1554,7 +1561,12 @@ const VendorRegistration: React.FC = () => {
                                   </SelectTrigger>
                                   <SelectContent className="max-h-80">
                                     {categories.map(cat => (
-                                      <SelectItem key={cat.id} value={cat.id}>{cat.label}</SelectItem>
+                                      <SelectItem key={cat.id} value={cat.id}>
+                                        <div className="flex items-center gap-2">
+                                          <cat.icon className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                                          <span>{cat.label}</span>
+                                        </div>
+                                      </SelectItem>
                                     ))}
                                   </SelectContent>
                                 </Select>
